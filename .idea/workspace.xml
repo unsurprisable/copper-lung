@@ -15,6 +15,13 @@
       <ProjectState />
     </projectState>
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="C:\Users\toast\.gradle\wrapper\dists\gradle-9.2.0-bin\11i5gvueggl8a5cioxuftxrik\gradle-9.2.0" javaHome="C:\Program Files\Java\jdk-25" gradleVersion="9.2.0" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
@@ -26,11 +33,13 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Gradle.copper-lung [:org.example.Main.main()].executor": "Run",
+    "Gradle.Download Sources.executor": "Run",
+    "Gradle.copper-lung [:org.example.Main.main()].executor": "Debug",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/toast/GitHub/Minestom/copper-lung/worlds/playerWorld",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -44,6 +53,27 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\toast\GitHub\Minestom\copper-lung\worlds\playerWorld" />
+      <recent name="C:\Users\toast\GitHub\Minestom\copper-lung\worlds" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Run Server" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="org.example.Main" />
+      <module name="copper-lung.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -61,7 +91,7 @@
       <updated>1763948979215</updated>
       <workItem from="1763949307312" duration="38000" />
       <workItem from="1763949355338" duration="198000" />
-      <workItem from="1763949582636" duration="401000" />
+      <workItem from="1763949582636" duration="6055000" />
     </task>
     <servers />
   </component>
