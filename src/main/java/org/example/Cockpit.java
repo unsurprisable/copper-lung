@@ -1,6 +1,5 @@
 package org.example;
 
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,12 +11,9 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
-import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.entity.metadata.other.InteractionMeta;
-import net.minestom.server.event.entity.EntityAttackEvent;
-import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.instance.InstanceTickEvent;
 import net.minestom.server.event.player.PlayerEntityInteractEvent;
 import net.minestom.server.instance.InstanceContainer;
@@ -27,8 +23,6 @@ import net.minestom.server.instance.anvil.AnvilLoader;
 import net.minestom.server.network.packet.server.play.SoundEffectPacket;
 import net.minestom.server.sound.SoundEvent;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Cockpit {
@@ -45,11 +39,13 @@ public class Cockpit {
     private int ticksSinceLastInput = 0;
     private Entity currentPressedButton = null;
 
-    final Pos controlCenter = new Pos (0.5, 2.016, -2.5, 0, -90);
+    final Pos controlCenter = new Pos (0.5, 2.01, -2.5, 0, -90);
 
     final TextColor BUTTON_COLOR = NamedTextColor.GOLD; //TextColor.color(215, 255, 255);
     final int BUTTON_BRIGHTNESS = 6;
-    final int BUTTON_PRESSED_BRIGHTNESS = 4;
+    final int BUTTON_PRESSED_BRIGHTNESS = 5;
+    final double BUTTON_HEIGHT = 0.025;
+    final double BUTTON_PRESSED_HEIGHT = 0.01;
 
 
 
@@ -60,16 +56,16 @@ public class Cockpit {
 
         this.submarine = submarine;
 
-        spawnButton(controlCenter.add(0.175, 0, 0.225), "▲",
+        spawnButton(controlCenter.add(0.175, BUTTON_HEIGHT, 0.225), "▲",
             new Vec(2.5, 0.65, 0.65), 0.1f, 0.03f, ButtonType.LONGITUDAL,
             () -> moveState = MoveState.FORWARD);
-        spawnButton(controlCenter.add(0.175, 0, 0.375), "▼",
+        spawnButton(controlCenter.add(0.175, BUTTON_HEIGHT, 0.375), "▼",
             new Vec(2.5, 0.65, 0.65), 0.1f, 0.03f, ButtonType.LONGITUDAL,
             () -> moveState = MoveState.BACKWARD);
-        spawnButton(controlCenter.add(-0.15, 0, 0.15), "▶",
+        spawnButton(controlCenter.add(-0.15, BUTTON_HEIGHT, 0.15), "▶",
             new Vec(1, 1, 2), 0.15f, 0.03f, ButtonType.LATERAL,
             () -> moveState = MoveState.RIGHT);
-        spawnButton(controlCenter.add(-0.35, 0, 0.15), "◀",
+        spawnButton(controlCenter.add(-0.35, BUTTON_HEIGHT, 0.15), "◀",
             new Vec(1, 1, 2), 0.15f, 0.03f, ButtonType.LATERAL,
             () -> moveState = MoveState.LEFT);
 
@@ -111,6 +107,17 @@ public class Cockpit {
         visualMeta.setBrightness(BUTTON_BRIGHTNESS, 0);
 
         visual.setInstance(instance, pos);
+
+        Entity shadow = new Entity(EntityType.TEXT_DISPLAY);
+        TextDisplayMeta shadowMeta = (TextDisplayMeta) shadow.getEntityMeta();
+        shadowMeta.setText(visualMeta.getText().color(NamedTextColor.BLACK));
+        shadowMeta.setScale(scale);
+        shadowMeta.setBackgroundColor(0);
+        shadowMeta.setBillboardRenderConstraints(AbstractDisplayMeta.BillboardConstraints.FIXED);
+        shadowMeta.setHasNoGravity(true);
+        shadowMeta.setBrightness(0, 0);
+
+        shadow.setInstance(instance, pos.withY(controlCenter.y()));
 
         HashSet<Entity> interactionEntities = new HashSet<>();
         if (buttonType == ButtonType.LONGITUDAL) {
@@ -169,7 +176,7 @@ public class Cockpit {
     }
 
     private void pressButtonVisual(Entity visual) {
-        visual.teleport(visual.getPosition().withY(controlCenter.y()-0.015));
+        visual.teleport(visual.getPosition().withY(controlCenter.y()+ BUTTON_PRESSED_HEIGHT));
 
         TextDisplayMeta visualMeta = (TextDisplayMeta)visual.getEntityMeta();
         visualMeta.setBrightness(BUTTON_PRESSED_BRIGHTNESS, 0);
@@ -179,7 +186,7 @@ public class Cockpit {
     }
 
     private void resetButtonVisual(Entity visual) {
-        visual.teleport(visual.getPosition().withY(controlCenter.y()));
+        visual.teleport(visual.getPosition().withY(controlCenter.y()+BUTTON_HEIGHT));
 
         TextDisplayMeta visualMeta = (TextDisplayMeta)visual.getEntityMeta();
         visualMeta.setBrightness(BUTTON_BRIGHTNESS, 0);
