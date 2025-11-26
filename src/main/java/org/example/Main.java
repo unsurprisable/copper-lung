@@ -1,5 +1,6 @@
 package org.example;
 
+import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.component.DataComponent;
 import net.minestom.server.component.DataComponents;
@@ -12,10 +13,6 @@ import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.network.packet.server.play.MapDataPacket;
-import net.minestom.server.tag.Tag;
-
-import java.util.List;
 
 public class Main {
 
@@ -42,6 +39,11 @@ public class Main {
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
             // initialize the camera display to be black when player joins
             submarine.getCamera().disableAndClearCameraMap();
+
+//            ItemStack devStick = ItemStack.builder(Material.STICK)
+//                .customName(Component.text("Dev Stick"))
+//                .build();
+//            player.getInventory().setItemStack(8, devStick);
         });
 
 

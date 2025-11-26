@@ -1,10 +1,13 @@
 package org.example;
 
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.MapDataPacket;
+import net.minestom.server.timer.Task;
+import net.minestom.server.timer.TaskSchedule;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +18,7 @@ public class SubmarineCamera {
     private final InstanceContainer oceanInstance;
 
     private boolean isCameraActive = false;
+    public Task activePrintingTask = null;
 
     public SubmarineCamera(InstanceContainer oceanInstance) {
         this.oceanInstance = oceanInstance;
@@ -64,18 +68,18 @@ public class SubmarineCamera {
     }
 
     private byte getWallFuzzyColor(double distance) {
-        double ratio = distance / MAX_CAMERA_DISTANCE;
-        ratio = Math.clamp(ratio, 0.0, 1.0);
+        double distRatio = distance / MAX_CAMERA_DISTANCE;
+        distRatio = Math.clamp(distRatio, 0.0, 1.0);
 
         double fogCurve = .45;
-        ratio = Math.pow(ratio, fogCurve);
+        distRatio = Math.pow(distRatio, fogCurve);
 
-        int minIndex = 18;
-        int maxIndex = grayscaleShades.length - 1 - 2;
-        double targetIndex = ratio * (maxIndex - minIndex) + minIndex;
+        int minIndex = 16;
+        int maxIndex = grayscaleShades.length - 1 - 1;
+        double targetIndex = distRatio * (maxIndex - minIndex) + minIndex;
 
         // widens the curve of the Gaussian to allow multiple shades to be picked
-        double fuzziness = 0.5 + ((1 - ratio) * 3);
+        double fuzziness = 1.2 + ((1-distRatio) * .75);
 
         return getFuzzyColor(targetIndex, fuzziness);
     }
@@ -96,11 +100,16 @@ public class SubmarineCamera {
     }
 
     private final double MAX_CAMERA_DISTANCE = 4;
+    private final long PHOTO_GENERATE_TIME = 2500;
 
     public void takePhoto(Pos origin) {
+        isCameraActive = true;
+
+        disableAndClearCameraMap();
+
         byte[] map_pixels = new byte[128 * 128];
 
-        isCameraActive = true;
+        long photoGenerateStartTime = System.currentTimeMillis();
 
         /* ----- FIRST RENDERING PASS -----
                   Floor & Background
@@ -192,7 +201,17 @@ public class SubmarineCamera {
             }
         }
 
-        pushCameraMapUpdatePacket(map_pixels);
+        long timeUntilPhotoPrinted = PHOTO_GENERATE_TIME - (System.currentTimeMillis() - photoGenerateStartTime);
+        if (timeUntilPhotoPrinted < 0) {
+            pushCameraMapUpdatePacket(map_pixels);
+            return;
+        }
+
+        // delay the packet until sound effect is done
+        activePrintingTask = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+            pushCameraMapUpdatePacket(map_pixels);
+            activePrintingTask = null;
+        }, TaskSchedule.millis(timeUntilPhotoPrinted), TaskSchedule.stop());
     }
 
     private double scan(Pos origin) {
@@ -215,8 +234,7 @@ public class SubmarineCamera {
     public void disableAndClearCameraMap() {
         isCameraActive = false;
         byte[] map_array = new byte[128 * 128];
-        // dark-gray to simulate the slight glow a black CRT/LCD screen would still emit
-        Arrays.fill(map_array, grayscaleShades[26]);
+        Arrays.fill(map_array, grayscaleShades[27]); // black
         pushCameraMapUpdatePacket(map_array);
     }
 
@@ -226,6 +244,13 @@ public class SubmarineCamera {
         Main.player.sendPacket(mapDataPacket);
     }
 
+
+    public void clearPrintingTask() {
+        if (activePrintingTask != null) {
+            activePrintingTask.cancel();
+            activePrintingTask = null;
+        }
+    }
 
 
     public boolean getIsCameraActive() {

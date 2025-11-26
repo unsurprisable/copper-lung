@@ -18,10 +18,10 @@ public class Submarine {
     private final InstanceContainer oceanInstance;
     private final SubmarineCamera camera;
 
+
     private double x;
     private double z;
     private double yaw;
-
     private int moveDirection = 0;
     private int rotateDirection = 0;
 

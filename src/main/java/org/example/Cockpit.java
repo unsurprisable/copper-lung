@@ -1,5 +1,6 @@
 package org.example;
 
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -44,8 +45,9 @@ public class Cockpit {
     private int ticksSinceLastInput = 0;
     private Entity currentPressedButton = null;
 
-    private final long cameraButtonDelay = 2500;
+    private final long cameraButtonDelay = 2650;
     private boolean cameraButtonDisabled = false;
+    private final Pos cameraScreenPos = new Pos(1.5, 2.5, 2.5);
 
     final Pos controlCenter = new Pos (0.5, 2.01, -2.5, 0, -90);
 
@@ -85,7 +87,7 @@ public class Cockpit {
             new Pos(0.55, 2.2, 2.99, 180, 0)
         );
 
-        spawnCameraMapScreen(new Pos(1.5, 2.5, 2.5));
+        spawnCameraMapScreen(cameraScreenPos);
 
 
         this.instance.eventNode().addListener(InstanceTickEvent.class, event -> {
@@ -204,6 +206,8 @@ public class Cockpit {
         // clear the camera display when the sub moves
         if (submarine.getCamera().getIsCameraActive()) {
             submarine.getCamera().disableAndClearCameraMap();
+        } else if (submarine.getCamera().activePrintingTask != null) {
+            submarine.getCamera().clearPrintingTask();
         }
 
         SoundEffectPacket clickSound = new SoundEffectPacket(SoundEvent.BLOCK_STONE_BUTTON_CLICK_ON, Sound.Source.BLOCK, visual.getPosition(), 0.3f, 1.5f, 0);
@@ -263,8 +267,13 @@ public class Cockpit {
     }
 
     private void pressCameraButton(Entity button) {
-        SoundEffectPacket clickSound = new SoundEffectPacket(SoundEvent.BLOCK_CHERRY_WOOD_FENCE_GATE_OPEN, Sound.Source.BLOCK, button.getPosition(), 0.3f, 1.5f, 3);
-        Main.player.sendPacket(clickSound);
+        Sound photoSound = Sound.sound(
+            Key.key("custom:take_photo"),
+            Sound.Source.BLOCK,
+            0.75f,
+            1.0f
+            );
+        Main.player.playSound(photoSound, cameraScreenPos);
 
         submarine.takePhoto();
 
