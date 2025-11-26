@@ -49,16 +49,21 @@ public class Cockpit {
     private boolean cameraButtonDisabled = false;
     private final Pos cameraScreenPos = new Pos(1.5, 2.5, 2.5);
 
+    private Entity angleDisplayEntity;
+    private Entity xDisplayEntity;
+    private Entity yDisplayEntity;
+    private Entity compassNeedleEntity;
+
     final Pos controlCenter = new Pos (0.5, 2.01, -2.5, 0, -90);
 
     private final TextColor BUTTON_COLOR = NamedTextColor.GRAY; //TextColor.color(215, 255, 255);
-    private final int BUTTON_BRIGHTNESS = 9;
+    private final int BUTTON_BRIGHTNESS = 10;
     private final int BUTTON_PRESSED_BRIGHTNESS = 8;
     private final double BUTTON_HEIGHT = 0.025;
     private final double BUTTON_PRESSED_HEIGHT = 0.01;
 
-    private final TextColor GLOWING_COLOR = TextColor.color(175, 215, 80);
-    private final int GLOWING_BRIGHTNESS = 12;
+    private final TextColor GLOWING_COLOR = TextColor.color(185, 220, 93);
+    private final int GLOWING_BRIGHTNESS = 13;
 
 
 
@@ -69,18 +74,27 @@ public class Cockpit {
 
         this.submarine = submarine;
 
-        spawnControlButton(controlCenter.add(0.175, BUTTON_HEIGHT, 0.225), "▲",
+        spawnControlButton(controlCenter.add(0.2, BUTTON_HEIGHT, 0.21), "▲",
             new Vec(2.5, 0.65, 0.65), 0.1f, 0.03f, ButtonType.LONGITUDINAL,
             () -> moveState = MoveState.FORWARD);
-        spawnControlButton(controlCenter.add(0.175, BUTTON_HEIGHT, 0.375), "▼",
+        spawnControlButton(controlCenter.add(0.2, BUTTON_HEIGHT, 0.36), "▼",
             new Vec(2.5, 0.65, 0.65), 0.1f, 0.03f, ButtonType.LONGITUDINAL,
             () -> moveState = MoveState.BACKWARD);
-        spawnControlButton(controlCenter.add(-0.15, BUTTON_HEIGHT, 0.15), "▶",
+        spawnControlButton(controlCenter.add(-0.15, BUTTON_HEIGHT, 0.43), "▶",
             new Vec(1, 1, 2), 0.15f, 0.03f, ButtonType.LATERAL,
             () -> moveState = MoveState.RIGHT);
-        spawnControlButton(controlCenter.add(-0.35, BUTTON_HEIGHT, 0.15), "◀",
+        spawnControlButton(controlCenter.add(-0.35, BUTTON_HEIGHT, 0.43), "◀",
             new Vec(1, 1, 2), 0.15f, 0.03f, ButtonType.LATERAL,
             () -> moveState = MoveState.LEFT);
+
+        spawnPositionDisplays(
+            new Vec(0.375, 0.55, 0.375),
+            new Pos(0.233, 0, -0.21),
+            new Pos(0.233, 0, -0.04),
+            new Pos(-0.25, 0, 0.16),
+            new Vec(0.9, 0.4, 1),
+            new Pos(-0.241, 0, -0.185)
+        );
 
         spawnCameraButton(
             new Vec(5, 1.75, 1),
@@ -89,12 +103,11 @@ public class Cockpit {
 
         spawnCameraMapScreen(cameraScreenPos);
 
-
         this.instance.eventNode().addListener(InstanceTickEvent.class, event -> {
             tickButtonReset();
             ticksSinceLastInput++;
 
-            updateDisplay();
+            updatePositionDisplay();
 
             switch (moveState) {
                 case FORWARD:
@@ -225,6 +238,62 @@ public class Cockpit {
         Main.player.sendPacket(releaseSound);
     }
 
+    private void spawnPositionDisplays(Vec scale, Pos xOffset, Pos yOffset, Pos angOffset, Vec compassScale, Pos compassOffset) {
+        xDisplayEntity = new Entity(EntityType.TEXT_DISPLAY);
+        yDisplayEntity = new Entity(EntityType.TEXT_DISPLAY);
+        angleDisplayEntity = new Entity(EntityType.TEXT_DISPLAY);
+        compassNeedleEntity = new Entity(EntityType.TEXT_DISPLAY);
+
+        Entity[] entities = {xDisplayEntity, yDisplayEntity, angleDisplayEntity};
+
+        for (Entity e : entities) {
+            TextDisplayMeta meta = (TextDisplayMeta) e.getEntityMeta();
+            meta.setAlignLeft(true);
+            meta.setBillboardRenderConstraints(AbstractDisplayMeta.BillboardConstraints.FIXED);
+            meta.setBrightness(GLOWING_BRIGHTNESS, 0);
+            meta.setScale(scale);
+            meta.setHasNoGravity(true);
+        }
+
+        TextDisplayMeta xMeta =  (TextDisplayMeta) xDisplayEntity.getEntityMeta();
+        TextDisplayMeta yMeta =  (TextDisplayMeta) yDisplayEntity.getEntityMeta();
+        TextDisplayMeta angleMeta =  (TextDisplayMeta) angleDisplayEntity.getEntityMeta();
+
+        xMeta.setText(Component.text("X: 123.67").color(GLOWING_COLOR));
+        yMeta.setText(Component.text("Y: 123.67").color(GLOWING_COLOR));
+        angleMeta.setText(Component.text("067.01").color(GLOWING_COLOR));
+
+        xDisplayEntity.setInstance(instance, controlCenter.add(xOffset));
+        yDisplayEntity.setInstance(instance, controlCenter.add(yOffset));
+        angleDisplayEntity.setInstance(instance, controlCenter.add(angOffset));
+
+        TextDisplayMeta compMeta =  (TextDisplayMeta) compassNeedleEntity.getEntityMeta();
+
+        // ⬤ ▶
+        compMeta.setAlignment(TextDisplayMeta.Alignment.CENTER);
+        compMeta.setText(Component.text("▶").color(GLOWING_COLOR));
+        compMeta.setBillboardRenderConstraints(AbstractDisplayMeta.BillboardConstraints.FIXED);
+        compMeta.setBrightness(GLOWING_BRIGHTNESS, 0);
+        compMeta.setScale(compassScale);
+        compMeta.setHasNoGravity(true);
+        compMeta.setTranslation(new Vec(-0.0105, -0.0556, 0));
+
+        compassNeedleEntity.setInstance(instance, controlCenter.add(compassOffset).withY(controlCenter.y()+BUTTON_HEIGHT));
+
+        Entity compassBack = new Entity(EntityType.TEXT_DISPLAY);
+
+        TextDisplayMeta  compassBackMeta = (TextDisplayMeta) compassBack.getEntityMeta();
+        compassBackMeta.setText(Component.text("⬤").color(NamedTextColor.BLACK));
+        compassBackMeta.setBillboardRenderConstraints(AbstractDisplayMeta.BillboardConstraints.FIXED);
+        compassBackMeta.setBrightness(0, 0);
+        compassBackMeta.setScale(new Vec(2));
+        compassBackMeta.setHasNoGravity(true);
+        compassBackMeta.setBackgroundColor(0);
+
+        compassBack.setInstance(instance,  controlCenter.add(compassOffset)
+            .add(-0.197, 0, 0.115).withYaw(45));
+    }
+
     private void spawnCameraButton(Vec scale, Pos pos) {
         Entity glow = new Entity(EntityType.TEXT_DISPLAY);
         TextDisplayMeta glowMeta = (TextDisplayMeta)glow.getEntityMeta();
@@ -300,9 +369,25 @@ public class Cockpit {
         screen.setInstance(instance, pos);
     }
 
-    private void updateDisplay() {
-        String hud = submarine.getPositionText();
-        Main.player.sendActionBar(Component.text(hud));
+    private void updatePositionDisplay() {
+//        String hud = submarine.getPositionText();
+//        Main.player.sendActionBar(Component.text(hud));
+
+        Entity[] entities = {xDisplayEntity, yDisplayEntity, angleDisplayEntity};
+
+        for (Entity e : entities) {
+            TextDisplayMeta meta = (TextDisplayMeta)e.getEntityMeta();
+            if (e == xDisplayEntity) {
+                meta.setText(Component.text(String.format("X: %06.2f", submarine.getX()*4)).color(GLOWING_COLOR));
+            } else if (e == yDisplayEntity) {
+                meta.setText(Component.text(String.format("Y: %06.2f", submarine.getZ()*4)).color(GLOWING_COLOR));
+            } else if (e ==  angleDisplayEntity) {
+                meta.setText(Component.text(String.format("%06.2f", submarine.getYaw())).color(GLOWING_COLOR));
+            }
+        }
+
+        float convertedYaw = (360 - (float)submarine.getYaw());
+        compassNeedleEntity.teleport(compassNeedleEntity.getPosition().withYaw(convertedYaw));
     }
 
     public InstanceContainer getInstance() {

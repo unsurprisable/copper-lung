@@ -28,7 +28,7 @@ public class Main {
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             player = event.getPlayer();
-            submarine = new Submarine(instanceManager, 47.5, 55.5, 90);
+            submarine = new Submarine(instanceManager, 47.5, 55.5, 135);
             cockpit = new Cockpit(instanceManager, submarine);
 
             event.setSpawningInstance(cockpit.getInstance());

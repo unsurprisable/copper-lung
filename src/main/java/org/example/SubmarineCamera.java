@@ -99,12 +99,10 @@ public class SubmarineCamera {
         };
     }
 
-    private final double MAX_CAMERA_DISTANCE = 4;
+    private final double MAX_CAMERA_DISTANCE = 5;
     private final long PHOTO_GENERATE_TIME = 2500;
 
     public void takePhoto(Pos origin) {
-        isCameraActive = true;
-
         disableAndClearCameraMap();
 
         byte[] map_pixels = new byte[128 * 128];
@@ -210,6 +208,7 @@ public class SubmarineCamera {
         // delay the packet until sound effect is done
         activePrintingTask = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             pushCameraMapUpdatePacket(map_pixels);
+            isCameraActive = true;
             activePrintingTask = null;
         }, TaskSchedule.millis(timeUntilPhotoPrinted), TaskSchedule.stop());
     }

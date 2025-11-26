@@ -25,10 +25,10 @@ public class Submarine {
     private int moveDirection = 0;
     private int rotateDirection = 0;
 
-    private final double moveAccel = 3.5;
-    private final double angAccel = 150;
+    private final double moveAccel = 3.0;
+    private final double angAccel = 85;
     private final double moveDrag = 2.8;
-    private final double angDrag = 8;
+    private final double angDrag = 5.5;
 
     private Vec moveVelocity =  new Vec(0,0);
     private double angVelocity = 0;
@@ -125,6 +125,15 @@ public class Submarine {
         return String.format("X: %.2f  |  Y: %.2f  |  A: %.2f   [(%.2f, %.2f), %.2f]", x, z, yaw, moveVelocity.x(), moveVelocity.z(), angVelocity);
     }
 
+    public double getX() {
+        return x;
+    }
+    public double getZ() {
+        return z;
+    }
+    public double getYaw() {
+        return yaw;
+    }
 
     public SubmarineCamera getCamera() {
         return camera;
