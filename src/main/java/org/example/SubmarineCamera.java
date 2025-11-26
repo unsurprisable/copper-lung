@@ -6,12 +6,15 @@ import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.MapDataPacket;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 public class SubmarineCamera {
 
     private final InstanceContainer oceanInstance;
+
+    private boolean isCameraActive = false;
 
     public SubmarineCamera(InstanceContainer oceanInstance) {
         this.oceanInstance = oceanInstance;
@@ -67,12 +70,12 @@ public class SubmarineCamera {
         double fogCurve = .45;
         ratio = Math.pow(ratio, fogCurve);
 
-        int minIndex = 15;
-        int maxIndex = grayscaleShades.length - 1 - 1;
+        int minIndex = 18;
+        int maxIndex = grayscaleShades.length - 1 - 2;
         double targetIndex = ratio * (maxIndex - minIndex) + minIndex;
 
         // widens the curve of the Gaussian to allow multiple shades to be picked
-        double fuzziness = 1 + ((1 - ratio) * 1.4);
+        double fuzziness = 0.5 + ((1 - ratio) * 3);
 
         return getFuzzyColor(targetIndex, fuzziness);
     }
@@ -96,6 +99,8 @@ public class SubmarineCamera {
 
     public void takePhoto(Pos origin) {
         byte[] map_pixels = new byte[128 * 128];
+
+        isCameraActive = true;
 
         /* ----- FIRST RENDERING PASS -----
                   Floor & Background
@@ -143,6 +148,9 @@ public class SubmarineCamera {
             }
         }
 
+        /* ----- SECOND RENDERING PASS -----
+                       Cave  Walls
+        */
         double fov = 80;
         double startAngle = -fov / 2;
         double angleStep = fov / 128; // degrees per pixel column
@@ -184,10 +192,7 @@ public class SubmarineCamera {
             }
         }
 
-        // MAP PACKET
-        MapDataPacket mapDataPacket = new MapDataPacket(0, (byte) 4, true, false, List.of(),
-            new MapDataPacket.ColorContent((byte)128, (byte)128, (byte)0, (byte)0, map_pixels));
-        Main.player.sendPacket(mapDataPacket);
+        pushCameraMapUpdatePacket(map_pixels);
     }
 
     private double scan(Pos origin) {
@@ -205,5 +210,25 @@ public class SubmarineCamera {
             }
         }
         return -1;
+    }
+
+    public void disableAndClearCameraMap() {
+        isCameraActive = false;
+        byte[] map_array = new byte[128 * 128];
+        // dark-gray to simulate the slight glow a black CRT/LCD screen would still emit
+        Arrays.fill(map_array, grayscaleShades[26]);
+        pushCameraMapUpdatePacket(map_array);
+    }
+
+    private void pushCameraMapUpdatePacket(byte[] array) {
+        MapDataPacket mapDataPacket = new MapDataPacket(0, (byte) 4, true, false, List.of(),
+            new MapDataPacket.ColorContent((byte)128, (byte)128, (byte)0, (byte)0, array));
+        Main.player.sendPacket(mapDataPacket);
+    }
+
+
+
+    public boolean getIsCameraActive() {
+        return isCameraActive;
     }
 }

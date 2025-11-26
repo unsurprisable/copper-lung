@@ -124,4 +124,9 @@ public class Submarine {
     public String getDebugPositionText() {
         return String.format("X: %.2f  |  Y: %.2f  |  A: %.2f   [(%.2f, %.2f), %.2f]", x, z, yaw, moveVelocity.x(), moveVelocity.z(), angVelocity);
     }
+
+
+    public SubmarineCamera getCamera() {
+        return camera;
+    }
 }

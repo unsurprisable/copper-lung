@@ -6,18 +6,15 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.component.DataComponent;
 import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.entity.metadata.other.GlowItemFrameMeta;
 import net.minestom.server.entity.metadata.other.InteractionMeta;
-import net.minestom.server.entity.metadata.other.ItemFrameMeta;
 import net.minestom.server.event.instance.InstanceTickEvent;
 import net.minestom.server.event.player.PlayerEntityInteractEvent;
 import net.minestom.server.instance.InstanceContainer;
@@ -28,7 +25,6 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SoundEffectPacket;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.tag.Tag;
 import net.minestom.server.timer.TaskSchedule;
 import net.minestom.server.utils.Direction;
 
@@ -182,7 +178,7 @@ public class Cockpit {
                resetButtonVisual(currentPressedButton);
            }
 
-            pressButtonVisual(visual);
+            pressCockpitButton(visual);
             currentPressedButton = visual;
         });
     }
@@ -199,11 +195,16 @@ public class Cockpit {
         }
     }
 
-    private void pressButtonVisual(Entity visual) {
+    private void pressCockpitButton(Entity visual) {
         visual.teleport(visual.getPosition().withY(controlCenter.y()+ BUTTON_PRESSED_HEIGHT));
 
         TextDisplayMeta visualMeta = (TextDisplayMeta)visual.getEntityMeta();
         visualMeta.setBrightness(BUTTON_PRESSED_BRIGHTNESS, 0);
+
+        // clear the camera display when the sub moves
+        if (submarine.getCamera().getIsCameraActive()) {
+            submarine.getCamera().disableAndClearCameraMap();
+        }
 
         SoundEffectPacket clickSound = new SoundEffectPacket(SoundEvent.BLOCK_STONE_BUTTON_CLICK_ON, Sound.Source.BLOCK, visual.getPosition(), 0.3f, 1.5f, 0);
 

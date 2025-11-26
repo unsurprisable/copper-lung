@@ -39,21 +39,10 @@ public class Main {
             player.setGameMode(GameMode.CREATIVE);
         });
 
-//        globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
-//
-//            MinecraftServer.getSchedulerManager().scheduleNextTick(() -> {
-//                MapDataPacket initPacket = new MapDataPacket(0, (byte) 4, true, false, List.of(), null);
-//                Main.player.sendPacket(initPacket);
-//            });
-//
-//            ItemStack filledMap = ItemStack.of(Material.FILLED_MAP)
-//
-//
-//            player.getInventory().setItemStack(0, filledMap);
-//
-//            System.out.println(filledMap.toItemNBT());
-//
-//        });
+        globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
+            // initialize the camera display to be black when player joins
+            submarine.getCamera().disableAndClearCameraMap();
+        });
 
 
         System.out.println("Starting server on port 25565...");
