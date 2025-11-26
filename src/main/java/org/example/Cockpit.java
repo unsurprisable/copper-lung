@@ -89,7 +89,7 @@ public class Cockpit {
             new Pos(0.55, 2.2, 2.99, 180, 0)
         );
 
-        spawnCameraMapScreen(new Pos(0.5, 2.5, 2.5));
+        spawnCameraMapScreen(new Pos(1.5, 2.5, 2.5));
 
 
         this.instance.eventNode().addListener(InstanceTickEvent.class, event -> {
