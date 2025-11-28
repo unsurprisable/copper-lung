@@ -338,11 +338,11 @@ public class Cockpit {
     private void pressCameraButton(Entity button) {
         Sound photoSound = Sound.sound(
             Key.key("custom:take_photo"),
-            Sound.Source.BLOCK,
-            0.75f,
+            Sound.Source.MASTER,
+            1.5f,
             1.0f
             );
-        Main.player.playSound(photoSound, cameraScreenPos);
+        Main.player.playSound(photoSound, 1.5, 2.5, 2.999);
 
         submarine.takePhoto();
 

@@ -1,6 +1,9 @@
 package org.example;
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.Auth;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.component.DataComponent;
 import net.minestom.server.component.DataComponents;
@@ -10,6 +13,8 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.extras.MojangAuth;
+import net.minestom.server.extras.mojangAuth.MojangCrypt;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -33,7 +38,7 @@ public class Main {
 
             event.setSpawningInstance(cockpit.getInstance());
             player.setRespawnPoint(new Pos(.5, 1, .5, 180, 0));
-            player.setGameMode(GameMode.CREATIVE);
+            player.setGameMode(GameMode.ADVENTURE);
         });
 
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
@@ -44,11 +49,15 @@ public class Main {
 //                .customName(Component.text("Dev Stick"))
 //                .build();
 //            player.getInventory().setItemStack(8, devStick);
+
+            Main.player.playSound(Sound.sound(
+                Key.key("custom:dark_bramble"),
+                Sound.Source.MASTER,
+                10f, 1f
+            ));
         });
 
-
-        System.out.println("Starting server on port 25565...");
         server.start("localhost", 25565);
-
+        System.out.println("Starting server on port 25565...");
     }
 }
