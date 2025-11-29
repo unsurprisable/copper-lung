@@ -1,0 +1,11 @@
+{
+  "take_photo": {
+    "sounds": [ "custom:take_photo" ]
+  },
+  "dark_bramble": {
+    "sounds": [ "custom:dark_bramble" ]
+  },
+  "open_map": {
+    "sounds": [ "custom:open_map" ]
+  }
+}

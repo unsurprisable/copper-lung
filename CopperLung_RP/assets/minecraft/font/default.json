@@ -1,0 +1,23 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "icons:map_gui.png",
+      "ascent": 15,
+      "height": 176,
+      "chars": [
+        "\uE001"
+      ]
+    },
+    {
+      "type": "space",
+      "advances": {
+        "\uF801": -8,
+        "\uF802": -16,
+        "\uF803": -32,
+        "\uF804": -64,
+        "\uF805": -128
+      }
+    }
+  ]
+}
