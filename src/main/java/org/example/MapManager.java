@@ -5,6 +5,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.event.player.PlayerSwapItemEvent;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
@@ -22,6 +23,12 @@ public class MapManager {
             Component.text("\uF801\uE001")
                 .color(NamedTextColor.WHITE)
         );
+
+        MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, event -> {
+            if (event.getInventory() == mapMarkerInventory || event.getInventory() == Main.player.getInventory()) {
+                event.setCancelled(true);
+            }
+        });
 
         new MapMarkerItem(Main.player.getInventory(), 11, 0, 0, 0);
         new MapMarkerItem(Main.player.getInventory(), 13, 0, 0, 0);
