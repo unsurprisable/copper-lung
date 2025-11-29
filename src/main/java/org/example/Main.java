@@ -3,6 +3,7 @@ package org.example;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.Auth;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.component.DataComponent;
@@ -16,6 +17,8 @@ import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.extras.mojangAuth.MojangCrypt;
 import net.minestom.server.instance.InstanceManager;
+import net.minestom.server.inventory.Inventory;
+import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
@@ -24,6 +27,7 @@ public class Main {
     public static Submarine submarine;
     public static Cockpit cockpit;
     public static Player player;
+    public static MapManager mapManager;
 
     static void main() {
 
@@ -33,8 +37,10 @@ public class Main {
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             player = event.getPlayer();
+
             submarine = new Submarine(instanceManager, 47.5, 55.5, 135);
             cockpit = new Cockpit(instanceManager, submarine);
+            mapManager = new MapManager();
 
             event.setSpawningInstance(cockpit.getInstance());
             player.setRespawnPoint(new Pos(.5, 1, .5, 180, 0));
@@ -45,16 +51,17 @@ public class Main {
             // initialize the camera display to be black when player joins
             submarine.getCamera().disableAndClearCameraMap();
 
+
 //            ItemStack devStick = ItemStack.builder(Material.STICK)
 //                .customName(Component.text("Dev Stick"))
 //                .build();
 //            player.getInventory().setItemStack(8, devStick);
 
-            Main.player.playSound(Sound.sound(
-                Key.key("custom:dark_bramble"),
-                Sound.Source.MASTER,
-                10f, 1f
-            ));
+//            Main.player.playSound(Sound.sound(
+//                Key.key("custom:dark_bramble"),
+//                Sound.Source.MASTER,
+//                10f, 1f
+//            ));
         });
 
         server.start("localhost", 25565);
