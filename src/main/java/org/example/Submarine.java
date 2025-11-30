@@ -2,7 +2,6 @@ package org.example;
 
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Player;
 import net.minestom.server.event.instance.InstanceTickEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.InstanceContainer;
@@ -33,7 +32,7 @@ public class Submarine {
     private Vec moveVelocity =  new Vec(0,0);
     private double angVelocity = 0;
 
-    public Submarine(InstanceManager instanceManager, double x, double z, double yaw) {
+    public Submarine(InstanceManager instanceManager, double inGameX, double inGameZ, double yaw) {
         this.oceanInstance = instanceManager.createInstanceContainer();
         oceanInstance.setChunkLoader(new AnvilLoader("worlds/ocean_world"));
         oceanInstance.enableAutoChunkLoad(false);
@@ -46,9 +45,8 @@ public class Submarine {
 
         this.camera = new SubmarineCamera(this.oceanInstance);
 
-
-        this.x = x;
-        this.z = z;
+        this.x = inGameZ;
+        this.z = inGameX;
         this.yaw = yaw;
 
         this.oceanInstance.eventNode().addListener(InstanceTickEvent.class, event -> {
@@ -118,14 +116,6 @@ public class Submarine {
 
     public void takePhoto() {
         camera.takePhoto(new Pos(z, 0, x, -(float)yaw, 0));
-    }
-
-    // IMPORTANT! display coordinates are multiplied by 4 to make the world seem bigger
-    public String getPositionText() {
-        return String.format("X: %.2f  |  Y: %.2f  |  A: %.2f", x*4, z*4, yaw);
-    }
-    public String getDebugPositionText() {
-        return String.format("X: %.2f  |  Y: %.2f  |  A: %.2f   [(%.2f, %.2f), %.2f]", x, z, yaw, moveVelocity.x(), moveVelocity.z(), angVelocity);
     }
 
     public double getX() {

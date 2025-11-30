@@ -378,12 +378,15 @@ public class Cockpit {
 
         Entity[] entities = {xDisplayEntity, yDisplayEntity, angleDisplayEntity};
 
+        final double x = (submarine.getX()-5) * 4; // z is off by 5 blocks in-game
+        final double z = (submarine.getZ()-4) * 4; // x is off by 2 blocks in-game
+
         for (Entity e : entities) {
             TextDisplayMeta meta = (TextDisplayMeta)e.getEntityMeta();
             if (e == xDisplayEntity) {
-                meta.setText(Component.text(String.format("X: %06.2f", submarine.getX()*4)).color(GLOWING_COLOR));
+                meta.setText(Component.text(String.format("X: %06.2f", x)).color(GLOWING_COLOR));
             } else if (e == yDisplayEntity) {
-                meta.setText(Component.text(String.format("Y: %06.2f", submarine.getZ()*4)).color(GLOWING_COLOR));
+                meta.setText(Component.text(String.format("Y: %06.2f", z)).color(GLOWING_COLOR));
             } else if (e ==  angleDisplayEntity) {
                 meta.setText(Component.text(String.format("%06.2f", submarine.getYaw())).color(GLOWING_COLOR));
             }
