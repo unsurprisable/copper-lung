@@ -42,7 +42,10 @@ public class Submarine {
         preloadOceanInstance(16);
         System.out.printf("Chunk loading completed in %d milliseconds\n", System.currentTimeMillis() - timeBeforeChunkLoading);
 
+        SpriteObjectScanner.scanWorld(oceanInstance);
+
         this.camera = new SubmarineCamera(this.oceanInstance);
+
 
         this.x = x;
         this.z = z;

@@ -38,7 +38,7 @@ public class Main {
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             player = event.getPlayer();
 
-            submarine = new Submarine(instanceManager, 47.5, 55.5, 135);
+            submarine = new Submarine(instanceManager, 47.5, 57.5, 180);
             cockpit = new Cockpit(instanceManager, submarine);
             mapManager = new MapManager();
 
@@ -50,12 +50,6 @@ public class Main {
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
             // initialize the camera display to be black when player joins
             submarine.getCamera().disableAndClearCameraMap();
-
-
-//            ItemStack devStick = ItemStack.builder(Material.STICK)
-//                .customName(Component.text("Dev Stick"))
-//                .build();
-//            player.getInventory().setItemStack(8, devStick);
 
 //            Main.player.playSound(Sound.sound(
 //                Key.key("custom:dark_bramble"),

@@ -22,11 +22,13 @@ public class SubmarineCamera {
 
     public SubmarineCamera(InstanceContainer oceanInstance) {
         this.oceanInstance = oceanInstance;
+
+        SpriteTexture seaweed = SpriteTexture.testPattern(10);
     }
 
     public enum Shade { BRIGHT, LIGHT, MID_LIGHT, MEDIUM, MID_DARK, DARK, VERY_DARK, VOID }
 
-    final byte[] grayscaleShades = {
+    public static final byte[] grayscaleShades = {
         (byte) 34,  // White (255)      @ 100% (255)  0
         (byte) 33,  // White (255)      @ 86%  (219)  1
         (byte) 32,  // White (255)      @ 71%  (181)  2
@@ -59,7 +61,7 @@ public class SubmarineCamera {
 
     private final Random rand = new Random();
 
-    private byte getFuzzyColor(double baseIndex, double fuzziness) {
+    public byte getFuzzyColor(double baseIndex, double fuzziness) {
         double noisyIndex = baseIndex + (rand.nextGaussian() * fuzziness);
         int finalIndex = (int) Math.round(noisyIndex);
         finalIndex = Math.clamp(finalIndex, 0, grayscaleShades.length-1);
@@ -84,7 +86,7 @@ public class SubmarineCamera {
         return getFuzzyColor(targetIndex, fuzziness);
     }
 
-    private byte getRandomColorByShade(Shade shade) {
+    public byte getRandomColorByShade(Shade shade) {
         Random rand = new Random();
 
         return switch (shade) {
@@ -99,13 +101,16 @@ public class SubmarineCamera {
         };
     }
 
-    private final double MAX_CAMERA_DISTANCE = 5;
+    public static final double MAX_CAMERA_DISTANCE = 5;
     private final long PHOTO_GENERATE_TIME = 2500;
 
-    public void takePhoto(Pos origin) {
+    public void takePhoto(Pos cameraPos) {
         disableAndClearCameraMap();
 
         byte[] map_pixels = new byte[128 * 128];
+
+        double[] zBuffer = new double[128];
+        Arrays.fill(zBuffer, Double.MAX_VALUE);
 
         long photoGenerateStartTime = System.currentTimeMillis();
 
@@ -165,10 +170,12 @@ public class SubmarineCamera {
         for (int x = 0; x < 128; x++) {
             double relativeAngle = startAngle + angleStep * x;
 
-            Pos rayPos = origin.withYaw((float)(origin.yaw() + relativeAngle));
+            Pos rayPos = cameraPos.withYaw((float)(cameraPos.yaw() + relativeAngle));
 
             double rawDistance = scan(rayPos);
             if (rawDistance == -1) continue; //nothing
+
+            zBuffer[x] = rawDistance;
 
             // fisheye curve correction
             double correctedDist = rawDistance * Math.cos(Math.toRadians(relativeAngle));
@@ -199,6 +206,14 @@ public class SubmarineCamera {
             }
         }
 
+        /* ----- THIRD RENDERING PASS -----
+                        Sprites
+        */
+
+        renderSprites(map_pixels, zBuffer, cameraPos);
+
+        /* ----- SENDING PACKET ----- */
+
         long timeUntilPhotoPrinted = PHOTO_GENERATE_TIME - (System.currentTimeMillis() - photoGenerateStartTime);
         if (timeUntilPhotoPrinted < 0) {
             pushCameraMapUpdatePacket(map_pixels);
@@ -228,6 +243,82 @@ public class SubmarineCamera {
             }
         }
         return -1;
+    }
+
+    private void renderSprites(byte[] pixels, double[] zBuffer, Pos cameraPos) {
+        SpriteObjectScanner.activeSprites.sort((s1, s2) -> {
+            double d1 = s1.position.distance(cameraPos);
+            double d2 = s2.position.distance(cameraPos);
+            return Double.compare(d2, d1); // sort sprites FAR to NEAR for proper transparency rendering
+        });
+
+        double halfWidth = 64;
+        double halfHeight = 64;
+        double focalLength = 76.3; // (approx. 80 fov)
+
+        for (SpriteObject sprite : SpriteObjectScanner.activeSprites) {
+
+            // --- TRANSFORMATION (World Space -> Camera Space) ---
+            double relX = sprite.position.x() - cameraPos.x();
+            double relZ = sprite.position.z() - cameraPos.z();
+
+            double yawRad = Math.toRadians(cameraPos.yaw());
+            double cos = Math.cos(-yawRad);
+            double sin = Math.sin(-yawRad);
+
+            double rotX = relX * cos - relZ * sin;
+            double rotZ = relX * sin + relZ * cos;
+
+            // clip if behind, too close, or too far
+            if (rotZ < 0.2 || rotZ > MAX_CAMERA_DISTANCE) continue;
+
+            double transformX = (-rotX / rotZ) * focalLength + halfWidth;
+
+            double wallScale = 80.0;
+            int spriteSize = (int) Math.abs(wallScale / rotZ);
+
+            // verticalOffset = 0.0 -> centered on horizon
+            // verticalOffset = 1.0 -> pushed down (floor)
+            // verticalOffset = -1.0 -> pushed up (ceiling)
+            int transformY = (int) (halfHeight + (sprite.verticalOffset * (spriteSize / 2.0)));
+
+            // draw bounds
+            int drawStartX = (int) (transformX - spriteSize / 2.0);
+            int drawEndX = drawStartX + spriteSize;
+            int drawStartY = (int) (transformY - spriteSize / 2.0);
+            int drawEndY = drawStartY + spriteSize;
+
+            // clip to screen
+            if (drawStartX < 0) drawStartX = 0;
+            if (drawEndX >= 128)  drawEndX = 128;
+            if (drawStartY < 0) drawStartY = 0;
+            if (drawEndY >= 128)  drawEndY = 128;
+
+            // PIXEL LOOP
+            for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
+                // check wall occlusion
+                if (zBuffer[stripe] < rotZ - 0.5) continue;
+
+                // texture mapping
+                int texX = (int) Math.round((stripe - (transformX - spriteSize / 2.0)) * (sprite.texture.width / (double) spriteSize));
+
+                if (texX < 0 || texX >= sprite.texture.width) continue;
+
+                for (int y = drawStartY; y < drawEndY; y++) {
+                    int texY = (int) Math.round((y - (transformY - spriteSize / 2.0)) * (sprite.texture.height / (double) spriteSize));
+
+                    if (texY < 0 || texY >= sprite.texture.height) continue;
+
+                    int colorIndex = sprite.texture.getPixel(texX, texY);
+
+                    if (colorIndex != -1) {
+                        byte finalPixel = grayscaleShades[colorIndex];
+                        int screenIndex = stripe + (y * 128);
+                        pixels[screenIndex] = finalPixel;
+                    }
+                }
+            }
+        }
     }
 
     public void disableAndClearCameraMap() {

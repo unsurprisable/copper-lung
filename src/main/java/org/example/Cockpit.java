@@ -74,6 +74,9 @@ public class Cockpit {
 
         this.submarine = submarine;
 
+        // FOR REFERENCE PLAYING AUDIO FROM A MOVABLE ENTITY SOURCE FOR VOLUME FADING:
+        // instance.playSound(sound, entity);
+
         spawnControlButton(controlCenter.add(0.2, BUTTON_HEIGHT, 0.21), "▲",
             new Vec(2.5, 0.65, 0.65), 0.1f, 0.03f, ButtonType.LONGITUDINAL,
             () -> moveState = MoveState.FORWARD);
