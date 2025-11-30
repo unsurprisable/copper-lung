@@ -102,7 +102,7 @@ public class SubmarineCamera {
     }
 
     private byte getWallFuzzyColor(double distance) {
-        double distRatio = (distance) / MAX_CAMERA_DISTANCE;
+        double distRatio = (distance) / MAX_WALL_DISTANCE;
         distRatio = Math.clamp(distRatio, 0.0, 1.0);
 
         double fogCurve = .45;
@@ -119,25 +119,26 @@ public class SubmarineCamera {
     }
 
     private byte getSpriteFuzzyColor(int baseIndex, double distance) {
-        double blockBuffer = 1.5; // how far away for the fog to start affecting the color
-        double maxFogDistance = MAX_CAMERA_DISTANCE - blockBuffer;
+        double blockBuffer = 1.75; // how far away for the fog to start affecting the color
+        double maxFogDistance = MAX_SPRITE_DISTANCE - blockBuffer;
 
         double adjustedDist = Math.clamp(distance - blockBuffer, 0, maxFogDistance);
         double distRatio = adjustedDist / maxFogDistance;
 
-        double fogCurve = 4;
+        double fogCurve = 3;
         distRatio = Math.pow(distRatio, fogCurve);
 
         int maxIndex = PALETTE_COLORS.length - 1;
         double targetIndex = baseIndex + (distRatio * (maxIndex - baseIndex));
 
         // widens the curve of the Gaussian to allow multiple shades to be picked
-        double fuzziness = 1.2 + ((1-distRatio) * .75);
+        double fuzziness = 1.75 + distRatio * 2;
 
         return getFuzzyColor(targetIndex, fuzziness);
     }
 
-    public static final double MAX_CAMERA_DISTANCE = 4;
+    public static final double MAX_WALL_DISTANCE = 4.5;
+    public static final double MAX_SPRITE_DISTANCE = 3.5;
     private final long PHOTO_GENERATE_TIME = 2500;
 
     public void takePhoto(Pos cameraPos) {
@@ -236,7 +237,7 @@ public class SubmarineCamera {
                 // simulate wall extending up while fading out of view
                 double ceilingRatio = (ceiling > 0) ? (double)(ceiling - y) / ceiling : 1.0;
 
-                double fakeDist = correctedDist + ((MAX_CAMERA_DISTANCE - correctedDist) * ceilingRatio);
+                double fakeDist = correctedDist + ((MAX_WALL_DISTANCE - correctedDist) * ceilingRatio);
 
                 map_pixels[index]  = getWallFuzzyColor(fakeDist);
             }
@@ -264,11 +265,11 @@ public class SubmarineCamera {
     }
 
     private double scan(Pos origin) {
-        final double stepSize = MAX_CAMERA_DISTANCE/1000;
+        final double stepSize = MAX_WALL_DISTANCE /1000;
 
         Vec direction = origin.direction();
 
-        for (double dist = 0; dist < MAX_CAMERA_DISTANCE; dist += stepSize) {
+        for (double dist = 0; dist < MAX_WALL_DISTANCE; dist += stepSize) {
             Pos checkPos = origin.add(direction.mul(dist));
 
             Block block = oceanInstance.getBlock(checkPos);
@@ -305,7 +306,7 @@ public class SubmarineCamera {
             double rotZ = relX * sin + relZ * cos; // distance from camera
 
             // clip if behind, too close, or too far
-            if (rotZ < 0.2 || rotZ > MAX_CAMERA_DISTANCE) continue;
+            if (rotZ < 0.2 || rotZ > MAX_WALL_DISTANCE) continue;
 
             double transformX = (-rotX / rotZ) * focalLength + halfWidth;
 

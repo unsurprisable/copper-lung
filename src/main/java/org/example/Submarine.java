@@ -1,5 +1,6 @@
 package org.example;
 
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.event.instance.InstanceTickEvent;
@@ -32,8 +33,12 @@ public class Submarine {
     private Vec moveVelocity =  new Vec(0,0);
     private double angVelocity = 0;
 
-    public Submarine(InstanceManager instanceManager, double inGameX, double inGameZ, double yaw) {
-        this.oceanInstance = instanceManager.createInstanceContainer();
+    public Submarine(Vec startPos) {
+        this(UnitConvert.fromYToX(startPos.y()), UnitConvert.fromXToZ(startPos.x()), startPos.z());
+    }
+
+    public Submarine(double inGameX, double inGameZ, double yaw) {
+        this.oceanInstance = MinecraftServer.getInstanceManager().createInstanceContainer();
         oceanInstance.setChunkLoader(new AnvilLoader("worlds/ocean_world"));
         oceanInstance.enableAutoChunkLoad(false);
 

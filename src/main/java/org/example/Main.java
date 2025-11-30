@@ -1,26 +1,14 @@
 package org.example;
 
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minestom.server.Auth;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.component.DataComponent;
-import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
-import net.minestom.server.extras.MojangAuth;
-import net.minestom.server.extras.mojangAuth.MojangCrypt;
 import net.minestom.server.instance.InstanceManager;
-import net.minestom.server.inventory.Inventory;
-import net.minestom.server.inventory.InventoryType;
-import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 
 public class Main {
 
@@ -34,7 +22,7 @@ public class Main {
         MinecraftServer server = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
 
-        submarine = new Submarine(instanceManager,112.25, 55.25, 246);
+        submarine = new Submarine(new Vec(286, 181, 67.67));
         cockpit = new Cockpit(instanceManager, submarine);
 
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();

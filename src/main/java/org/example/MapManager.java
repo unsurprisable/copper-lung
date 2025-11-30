@@ -40,7 +40,7 @@ public class MapManager {
         new MapMarkerItem(Main.player.getInventory(), 11, 323, 282, 262); // objective_2
         new MapMarkerItem(Main.player.getInventory(), 13, 519, 261, 8); // objective_4
         new MapMarkerItem(Main.player.getInventory(), 17, 896, 247, 293); // objective 6
-        new MapMarkerItem(Main.player.getInventory(), 20, 289, 183, 33); // objective_1
+        new MapMarkerItem(Main.player.getInventory(), 20, 286, 181, 33); // objective_1
         new MapMarkerItem(Main.player.getInventory(), 23, 603, 176, 296); // objective_5
     }
 
