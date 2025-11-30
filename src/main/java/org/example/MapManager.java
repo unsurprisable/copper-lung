@@ -10,6 +10,7 @@ import net.minestom.server.event.player.PlayerSwapItemEvent;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 
+
 public class MapManager {
 
     private final Inventory mapMarkerInventory;
@@ -30,16 +31,17 @@ public class MapManager {
             }
         });
 
-        new MapMarkerItem(Main.player.getInventory(), 11, 0, 0, 0);
-        new MapMarkerItem(Main.player.getInventory(), 13, 0, 0, 0);
-        new MapMarkerItem(Main.player.getInventory(), 17, 0, 0, 0);
-        new MapMarkerItem(Main.player.getInventory(), 20, 310, 277, 315);
-        new MapMarkerItem(Main.player.getInventory(), 23, 0, 0, 0);
-        new MapMarkerItem(mapMarkerInventory, 6, 0, 0, 0);
-        new MapMarkerItem(mapMarkerInventory, 11, 0, 0, 0);
-        new MapMarkerItem(mapMarkerInventory, 18, 0, 0, 0);
-        new MapMarkerItem(mapMarkerInventory, 32, 0, 0, 0);
-        new MapMarkerItem(mapMarkerInventory, 37, 0, 0, 0);
+
+        new MapMarkerItem(mapMarkerInventory, 6,  724, 835, 153); // objective_10
+        new MapMarkerItem(mapMarkerInventory, 11, 305, 747, 157); // objective_8
+        new MapMarkerItem(mapMarkerInventory, 18, 118, 622, 3); // objective_9
+        new MapMarkerItem(mapMarkerInventory, 32, 598, 552, 57); // objective_7
+        new MapMarkerItem(mapMarkerInventory, 37, 201, 433, 246); // objective_3
+        new MapMarkerItem(Main.player.getInventory(), 11, 323, 282, 262); // objective_2
+        new MapMarkerItem(Main.player.getInventory(), 13, 519, 261, 8); // objective_4
+        new MapMarkerItem(Main.player.getInventory(), 17, 896, 247, 293); // objective 6
+        new MapMarkerItem(Main.player.getInventory(), 20, 289, 183, 33); // objective_1
+        new MapMarkerItem(Main.player.getInventory(), 23, 603, 176, 296); // objective_5
     }
 
     private void openMap() {

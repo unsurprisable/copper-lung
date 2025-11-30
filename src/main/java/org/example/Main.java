@@ -34,13 +34,15 @@ public class Main {
         MinecraftServer server = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
 
+        submarine = new Submarine(instanceManager,112.25, 55.25, 246);
+        cockpit = new Cockpit(instanceManager, submarine);
+
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
+//            if (player != null) {
+//                event.getPlayer().kick(Component.text("Map has already been generated! Restart the server to rejoin.").color(NamedTextColor.RED));
+//            }
             player = event.getPlayer();
-
-            submarine = new Submarine(instanceManager, 47.5, 57.5, 180);
-            cockpit = new Cockpit(instanceManager, submarine);
-            mapManager = new MapManager();
 
             event.setSpawningInstance(cockpit.getInstance());
             player.setRespawnPoint(new Pos(.5, 1, .5, 180, 0));
@@ -50,6 +52,7 @@ public class Main {
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
             // initialize the camera display to be black when player joins
             submarine.getCamera().disableAndClearCameraMap();
+            mapManager = new MapManager();
 
 //            Main.player.playSound(Sound.sound(
 //                Key.key("custom:dark_bramble"),

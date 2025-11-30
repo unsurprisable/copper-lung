@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static org.example.SubmarineCamera.ColorPalette.PALETTE_COLORS;
+
 public class SubmarineCamera {
 
     private final InstanceContainer oceanInstance;
@@ -26,58 +28,88 @@ public class SubmarineCamera {
         SpriteTexture seaweed = SpriteTexture.testPattern(10);
     }
 
-    public enum Shade { BRIGHT, LIGHT, MID_LIGHT, MEDIUM, MID_DARK, DARK, VERY_DARK, VOID }
+    public static class ColorPalette {
+        public static final byte[] PALETTE_COLORS = {
+            (byte) 34,  // White (255)      @ 100% (255)  0
+            (byte) 33,  // White (255)      @ 86%  (219)  1
+            (byte) 32,  // White (255)      @ 71%  (181)  2
+            (byte) 26,  // Lt Gray (167)    @ 100% (167)  3
+            (byte) 90,  // W.Terra (153)    @ 100% (153)  4
+            (byte) 25,  // Lt Gray (167)    @ 86%  (144)  5
+            (byte) 35,  // White (255)      @ 53%  (135)  6
+            (byte) 89,  // W.Terra (153)    @ 86%  (131)  7
+            (byte) 24,  // Lt Gray (167)    @ 71%  (119)  8
+            (byte) 46,  // Gray (112)       @ 100% (112)  9
+            (byte) 88,  // W.Terra (153)    @ 71%  (108)  10
+            (byte) 238, // Deepslate (100)  @ 100% (100)  11
+            (byte) 45,  // Gray (112)       @ 86%  (96)   12
+            (byte) 27,  // Lt Gray (167)    @ 53%  (89)   13
+            (byte) 237, // Deepslate (100)  @ 86%  (86)   14
+            (byte) 91,  // W.Terra (153)    @ 53%  (81)   15
+            (byte) 44,  // Gray (112)       @ 71%  (80)   16
+            (byte) 86,  // G.Terra (76)     @ 100% (76)   17
+            (byte) 236, // Deepslate (100)  @ 71%  (71)   18
+            (byte) 85,  // G.Terra (76)     @ 86%  (65)   19
+            (byte) 47,  // Gray (112)       @ 53%  (59)   20
+            (byte) 84,  // G.Terra (76)     @ 71%  (54)   21
+            (byte) 239, // Deepslate (100)  @ 53%  (53)   22
+            (byte) 87,  // G.Terra (76)     @ 53%  (40)   23
+            (byte) 118, // Black (25)       @ 100% (25)   24
+            (byte) 117, // Black (25)       @ 86%  (21)   25
+            (byte) 116, // Black (25)       @ 71%  (17)   26
+            (byte) 119  // Black (25)       @ 53%  (13)   27
+        };
 
-    public static final byte[] grayscaleShades = {
-        (byte) 34,  // White (255)      @ 100% (255)  0
-        (byte) 33,  // White (255)      @ 86%  (219)  1
-        (byte) 32,  // White (255)      @ 71%  (181)  2
-        (byte) 26,  // Lt Gray (167)    @ 100% (167)  3
-        (byte) 90,  // W.Terra (153)    @ 100% (153)  4
-        (byte) 25,  // Lt Gray (167)    @ 86%  (144)  5
-        (byte) 35,  // White (255)      @ 53%  (135)  6
-        (byte) 89,  // W.Terra (153)    @ 86%  (131)  7
-        (byte) 24,  // Lt Gray (167)    @ 71%  (119)  8
-        (byte) 46,  // Gray (112)       @ 100% (112)  9
-        (byte) 88,  // W.Terra (153)    @ 71%  (108)  10
-        (byte) 238, // Deepslate (100)  @ 100% (100)  11
-        (byte) 45,  // Gray (112)       @ 86%  (96)   12
-        (byte) 27,  // Lt Gray (167)    @ 53%  (89)   13
-        (byte) 237, // Deepslate (100)  @ 86%  (86)   14
-        (byte) 91,  // W.Terra (153)    @ 53%  (81)   15
-        (byte) 44,  // Gray (112)       @ 71%  (80)   16
-        (byte) 86,  // G.Terra (76)     @ 100% (76)   17
-        (byte) 236, // Deepslate (100)  @ 71%  (71)   18
-        (byte) 85,  // G.Terra (76)     @ 86%  (65)   19
-        (byte) 47,  // Gray (112)       @ 53%  (59)   20
-        (byte) 84,  // G.Terra (76)     @ 71%  (54)   21
-        (byte) 239, // Deepslate (100)  @ 53%  (53)   22
-        (byte) 87,  // G.Terra (76)     @ 53%  (40)   23
-        (byte) 118, // Black (25)       @ 100% (25)   24
-        (byte) 117, // Black (25)       @ 86%  (21)   25
-        (byte) 116, // Black (25)       @ 71%  (17)   26
-        (byte) 119  // Black (25)       @ 53%  (13)   27
-    };
+        private static final int[] PALETTE_BRIGHTNESS = {
+            255,
+            219,
+            181,
+            167, 153, 144, 135, 131,
+            119, 112, 108, 100, 96,
+            89, 86, 81, 80, 76, 71, 65, 59, 54, 53, 40,
+            25, 21, 17, 13
+        };
+
+        /**
+         * Determines the best-match map color ID based on a given brightness value.
+         * @param targetBrightness double 0-255
+         */
+        public static int getClosestPaletteIndex(double targetBrightness) {
+            int bestIndex = 0;
+            double minDifference = Double.MAX_VALUE;
+
+            for (int i = 0; i < PALETTE_BRIGHTNESS.length; i++) {
+                double diff = Math.abs(targetBrightness - PALETTE_BRIGHTNESS[i]);
+
+                if (diff < minDifference) {
+                    minDifference = diff;
+                    bestIndex = i;
+                }
+            }
+            return bestIndex;
+        }
+
+    }
 
     private final Random rand = new Random();
 
     public byte getFuzzyColor(double baseIndex, double fuzziness) {
         double noisyIndex = baseIndex + (rand.nextGaussian() * fuzziness);
         int finalIndex = (int) Math.round(noisyIndex);
-        finalIndex = Math.clamp(finalIndex, 0, grayscaleShades.length-1);
+        finalIndex = Math.clamp(finalIndex, 0, PALETTE_COLORS.length-1);
 
-        return grayscaleShades[finalIndex];
+        return PALETTE_COLORS[finalIndex];
     }
 
     private byte getWallFuzzyColor(double distance) {
-        double distRatio = distance / MAX_CAMERA_DISTANCE;
+        double distRatio = (distance) / MAX_CAMERA_DISTANCE;
         distRatio = Math.clamp(distRatio, 0.0, 1.0);
 
         double fogCurve = .45;
         distRatio = Math.pow(distRatio, fogCurve);
 
-        int minIndex = 16;
-        int maxIndex = grayscaleShades.length - 1 - 1;
+        int minIndex = 14;
+        int maxIndex = PALETTE_COLORS.length - 1 - 1;
         double targetIndex = distRatio * (maxIndex - minIndex) + minIndex;
 
         // widens the curve of the Gaussian to allow multiple shades to be picked
@@ -86,22 +118,26 @@ public class SubmarineCamera {
         return getFuzzyColor(targetIndex, fuzziness);
     }
 
-    public byte getRandomColorByShade(Shade shade) {
-        Random rand = new Random();
+    private byte getSpriteFuzzyColor(int baseIndex, double distance) {
+        double blockBuffer = 1.5; // how far away for the fog to start affecting the color
+        double maxFogDistance = MAX_CAMERA_DISTANCE - blockBuffer;
 
-        return switch (shade) {
-            case BRIGHT -> grayscaleShades[rand.nextInt(0, 4)];
-            case LIGHT -> grayscaleShades[rand.nextInt(4, 8)];
-            case MID_LIGHT -> grayscaleShades[rand.nextInt(8, 12)];
-            case MEDIUM -> grayscaleShades[rand.nextInt(12, 15)];
-            case MID_DARK -> grayscaleShades[rand.nextInt(15, 20)];
-            case DARK -> grayscaleShades[rand.nextInt(20, 23)];
-            case VERY_DARK -> grayscaleShades[23];
-            case VOID -> grayscaleShades[rand.nextInt(24, 28)];
-        };
+        double adjustedDist = Math.clamp(distance - blockBuffer, 0, maxFogDistance);
+        double distRatio = adjustedDist / maxFogDistance;
+
+        double fogCurve = 4;
+        distRatio = Math.pow(distRatio, fogCurve);
+
+        int maxIndex = PALETTE_COLORS.length - 1;
+        double targetIndex = baseIndex + (distRatio * (maxIndex - baseIndex));
+
+        // widens the curve of the Gaussian to allow multiple shades to be picked
+        double fuzziness = 1.2 + ((1-distRatio) * .75);
+
+        return getFuzzyColor(targetIndex, fuzziness);
     }
 
-    public static final double MAX_CAMERA_DISTANCE = 5;
+    public static final double MAX_CAMERA_DISTANCE = 4;
     private final long PHOTO_GENERATE_TIME = 2500;
 
     public void takePhoto(Pos cameraPos) {
@@ -209,7 +245,6 @@ public class SubmarineCamera {
         /* ----- THIRD RENDERING PASS -----
                         Sprites
         */
-
         renderSprites(map_pixels, zBuffer, cameraPos);
 
         /* ----- SENDING PACKET ----- */
@@ -238,7 +273,7 @@ public class SubmarineCamera {
 
             Block block = oceanInstance.getBlock(checkPos);
 
-            if (block.isSolid()) {
+            if (block.compare(Block.COBBLED_DEEPSLATE)) {
                 return dist;
             }
         }
@@ -247,8 +282,8 @@ public class SubmarineCamera {
 
     private void renderSprites(byte[] pixels, double[] zBuffer, Pos cameraPos) {
         SpriteObjectScanner.activeSprites.sort((s1, s2) -> {
-            double d1 = s1.position.distance(cameraPos);
-            double d2 = s2.position.distance(cameraPos);
+            double d1 = s1.position().distance(cameraPos);
+            double d2 = s2.position().distance(cameraPos);
             return Double.compare(d2, d1); // sort sprites FAR to NEAR for proper transparency rendering
         });
 
@@ -259,15 +294,15 @@ public class SubmarineCamera {
         for (SpriteObject sprite : SpriteObjectScanner.activeSprites) {
 
             // --- TRANSFORMATION (World Space -> Camera Space) ---
-            double relX = sprite.position.x() - cameraPos.x();
-            double relZ = sprite.position.z() - cameraPos.z();
+            double relX = sprite.position().x() - cameraPos.x();
+            double relZ = sprite.position().z() - cameraPos.z();
 
             double yawRad = Math.toRadians(cameraPos.yaw());
             double cos = Math.cos(-yawRad);
             double sin = Math.sin(-yawRad);
 
             double rotX = relX * cos - relZ * sin;
-            double rotZ = relX * sin + relZ * cos;
+            double rotZ = relX * sin + relZ * cos; // distance from camera
 
             // clip if behind, too close, or too far
             if (rotZ < 0.2 || rotZ > MAX_CAMERA_DISTANCE) continue;
@@ -275,18 +310,20 @@ public class SubmarineCamera {
             double transformX = (-rotX / rotZ) * focalLength + halfWidth;
 
             double wallScale = 80.0;
-            int spriteSize = (int) Math.abs(wallScale / rotZ);
+            int baseScale = (int) Math.abs(wallScale / rotZ);
+
+            int drawSize = (int) (baseScale * sprite.size());
 
             // verticalOffset = 0.0 -> centered on horizon
             // verticalOffset = 1.0 -> pushed down (floor)
             // verticalOffset = -1.0 -> pushed up (ceiling)
-            int transformY = (int) (halfHeight + (sprite.verticalOffset * (spriteSize / 2.0)));
+            int transformY = (int) (halfHeight + (sprite.verticalOffset() * (baseScale / 2.0)));
 
             // draw bounds
-            int drawStartX = (int) (transformX - spriteSize / 2.0);
-            int drawEndX = drawStartX + spriteSize;
-            int drawStartY = (int) (transformY - spriteSize / 2.0);
-            int drawEndY = drawStartY + spriteSize;
+            int drawStartX = (int) (transformX - drawSize / 2.0);
+            int drawEndX = drawStartX + drawSize;
+            int drawStartY = (int) (transformY - drawSize / 2.0);
+            int drawEndY = drawStartY + drawSize;
 
             // clip to screen
             if (drawStartX < 0) drawStartX = 0;
@@ -300,19 +337,19 @@ public class SubmarineCamera {
                 if (zBuffer[stripe] < rotZ - 0.5) continue;
 
                 // texture mapping
-                int texX = (int) Math.round((stripe - (transformX - spriteSize / 2.0)) * (sprite.texture.width / (double) spriteSize));
+                int texX = (int) Math.round((stripe - (transformX - drawSize / 2.0)) * (sprite.texture().width / (double) drawSize));
 
-                if (texX < 0 || texX >= sprite.texture.width) continue;
+                if (texX < 0 || texX >= sprite.texture().width) continue;
 
                 for (int y = drawStartY; y < drawEndY; y++) {
-                    int texY = (int) Math.round((y - (transformY - spriteSize / 2.0)) * (sprite.texture.height / (double) spriteSize));
+                    int texY = (int) Math.round((y - (transformY - drawSize / 2.0)) * (sprite.texture().height / (double) drawSize));
 
-                    if (texY < 0 || texY >= sprite.texture.height) continue;
+                    if (texY < 0 || texY >= sprite.texture().height) continue;
 
-                    int colorIndex = sprite.texture.getPixel(texX, texY);
+                    int colorIndex = sprite.texture().getPixel(texX, texY);
 
                     if (colorIndex != -1) {
-                        byte finalPixel = grayscaleShades[colorIndex];
+                        byte finalPixel = getSpriteFuzzyColor(colorIndex, rotZ);
                         int screenIndex = stripe + (y * 128);
                         pixels[screenIndex] = finalPixel;
                     }
@@ -324,7 +361,7 @@ public class SubmarineCamera {
     public void disableAndClearCameraMap() {
         isCameraActive = false;
         byte[] map_array = new byte[128 * 128];
-        Arrays.fill(map_array, grayscaleShades[27]); // black
+        Arrays.fill(map_array, PALETTE_COLORS[27]); // black
         pushCameraMapUpdatePacket(map_array);
     }
 
