@@ -47,7 +47,7 @@ public class Cockpit {
 
     private final long cameraButtonDelay = 2650;
     private boolean cameraButtonDisabled = false;
-    private final Pos cameraScreenPos = new Pos(1.5, 2.5, 2.5);
+    private final Pos cameraScreenPos = new Pos(0.5, 2.5, 2.5);
 
     private Entity angleDisplayEntity;
     private Entity xDisplayEntity;
