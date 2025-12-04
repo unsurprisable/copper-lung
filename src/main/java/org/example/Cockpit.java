@@ -19,7 +19,6 @@ import net.minestom.server.entity.metadata.other.InteractionMeta;
 import net.minestom.server.event.instance.InstanceTickEvent;
 import net.minestom.server.event.player.PlayerEntityInteractEvent;
 import net.minestom.server.instance.InstanceContainer;
-import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.anvil.AnvilLoader;
 import net.minestom.server.item.ItemStack;
@@ -73,9 +72,6 @@ public class Cockpit {
         this.instance = MinecraftServer.getInstanceManager().createInstanceContainer();
         this.instance.setChunkSupplier(LightingChunk::new);
         this.instance.setChunkLoader(new AnvilLoader("worlds/cockpit_world"));
-
-        // FOR REFERENCE PLAYING AUDIO FROM A MOVABLE ENTITY SOURCE FOR VOLUME FADING:
-        // instance.playSound(sound, entity);
 
         spawnControlButton(controlCenter.add(0.2, BUTTON_HEIGHT, 0.21), "▲",
             new Vec(2.5, 0.65, 0.65), 0.1f, 0.03f, ButtonType.LONGITUDINAL,
@@ -320,24 +316,21 @@ public class Cockpit {
     }
 
     private void pressCameraButton(Entity button) {
-        Sound photoSound = Sound.sound(
-            Key.key("custom:take_photo"),
-            Sound.Source.MASTER,
-            1.5f,
-            1.0f
-            );
-        Main.player.playSound(photoSound, 1.5, 2.5, 2.999);
+        cameraButtonDisabled = true;
+        Main.player.playSound(SoundManager.TAKE_PHOTO, 1.5, 2.5, 2.999);
 
         Main.player.swingMainHand();
 
         Submarine.Instance.takePhoto();
+        Vec origin = new Vec(Submarine.Instance.getMapX(), Submarine.Instance.getMapY(), Submarine.Instance.getYaw());
 
-        cameraButtonDisabled = true;
+        MinecraftServer.getSchedulerManager().scheduleTask(() -> onCameraFinish(origin),
+            TaskSchedule.millis(cameraButtonDelay), TaskSchedule.stop());
+    }
 
-        MinecraftServer.getSchedulerManager().scheduleTask(
-            () -> cameraButtonDisabled = false,
-            TaskSchedule.millis(cameraButtonDelay), TaskSchedule.stop()
-        );
+    private void onCameraFinish(Vec origin) {
+        cameraButtonDisabled = false;
+        MapManager.Instance.checkIsPhotoValid(origin);
     }
 
     private void spawnCameraMapScreen(Pos pos) {
@@ -361,15 +354,12 @@ public class Cockpit {
 
         Entity[] entities = {xDisplayEntity, yDisplayEntity, angleDisplayEntity};
 
-        final double x = (Submarine.Instance.getX()-5) * 4; // z is off by 5 blocks in-game
-        final double z = (Submarine.Instance.getZ()-4) * 4; // x is off by 2 blocks in-game
-
         for (Entity e : entities) {
             TextDisplayMeta meta = (TextDisplayMeta)e.getEntityMeta();
             if (e == xDisplayEntity) {
-                meta.setText(Component.text(String.format("X: %06.2f", x)).color(GLOWING_COLOR));
+                meta.setText(Component.text(String.format("X: %06.2f", Submarine.Instance.getMapX())).color(GLOWING_COLOR));
             } else if (e == yDisplayEntity) {
-                meta.setText(Component.text(String.format("Y: %06.2f", z)).color(GLOWING_COLOR));
+                meta.setText(Component.text(String.format("Y: %06.2f", Submarine.Instance.getMapY())).color(GLOWING_COLOR));
             } else if (e ==  angleDisplayEntity) {
                 meta.setText(Component.text(String.format("%06.2f", Submarine.Instance.getYaw())).color(GLOWING_COLOR));
             }

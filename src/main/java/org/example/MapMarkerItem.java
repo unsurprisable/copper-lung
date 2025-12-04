@@ -14,12 +14,20 @@ public class MapMarkerItem {
     private final ItemStack itemStack;
     private final AbstractInventory inventory;
     private final int slot;
+
     private boolean isCompleted;
+    private final int x;
+    private final int y;
+    private final int yaw;
 
     public MapMarkerItem(AbstractInventory inventory, int slot, int x, int y, int yaw) {
         this.inventory = inventory;
         this.slot = slot;
+
         this.isCompleted = false;
+        this.x = x;
+        this.y = y;
+        this.yaw = yaw;
 
         Component name = Component.text("PHOTO ✕").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
         Component[] lore = {
@@ -43,7 +51,22 @@ public class MapMarkerItem {
     public void setCompleted() {
         this.isCompleted = true;
         inventory.setItemStack(slot, itemStack.withCustomName(
-            Component.text("PHOTO ✓").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)
+            Component.text("PHOTO ").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false).append(
+                Component.text("✓").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false).decorate(TextDecoration.BOLD)
+            )
         ));
+    }
+
+    public boolean getIsCompleted() {
+        return isCompleted;
+    }
+    public int getX() {
+        return x;
+    }
+    public int getY() {
+        return y;
+    }
+    public int getYaw() {
+        return yaw;
     }
 }

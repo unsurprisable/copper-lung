@@ -7,6 +7,8 @@ import net.minestom.server.event.instance.InstanceTickEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.anvil.AnvilLoader;
+import net.minestom.server.potion.Potion;
+import net.minestom.server.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +30,8 @@ public class Submarine {
     private int moveDirection = 0;
     private int rotateDirection = 0;
 
-    private final double minMoveAccel = 0.8;
-    private final double maxMoveAccel = 3.8;
+    private final double minMoveAccel = 0.5;
+    private final double maxMoveAccel = 4.8;
     private final double moveDrag = 3.2;
     private final int moveAccelChargeTicks = 50;
     private final double minAngAccel = 0;
@@ -107,8 +109,6 @@ public class Submarine {
             }
             this.yaw = newYaw;
 
-            // MOVING SOUND EFFECT
-
             if (moveState != MoveState.NONE) {
                 inputHeldTicks++;
             }
@@ -140,8 +140,14 @@ public class Submarine {
     public double getX() {
         return x;
     }
+    public double getMapX() {
+        return (x - 5) * 4;
+    }
     public double getZ() {
         return z;
+    }
+    public double getMapY() {
+        return (z - 4) * 4;
     }
     public double getYaw() {
         return yaw;
@@ -164,5 +170,16 @@ public class Submarine {
 
     public double getTotalSpeed() {
         return moveVelocity.length() + getConvertedAngularSpeed();
+    }
+
+    public void teleport(double mapX, double mapY, double newYaw) {
+        moveVelocity = Vec.ZERO;
+        angVelocity = 0;
+        this.x = UnitConvert.fromXToZ(mapX); // why is it actually going to X instead of Z???????????
+        this.z = UnitConvert.fromYToX(mapY); // (this is necessary for it to work, but like what????)
+        this.yaw = newYaw;
+        Main.player.playSound(SoundManager.TELEPORT);
+        Main.player.addEffect(new Potion(PotionEffect.BLINDNESS, 255, 25));
+        new Screenshake(5);
     }
 }
