@@ -13,32 +13,31 @@ import net.minestom.server.instance.InstanceManager;
 
 public class Main {
 
-    public static Submarine submarine;
-    public static Cockpit cockpit;
     public static Player player;
-    public static MapManager mapManager;
 
     static void main() {
 
         MinecraftServer server = MinecraftServer.init();
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
 
-        submarine = new Submarine(new Vec(286, 181, 67.67));
-        cockpit = new Cockpit(instanceManager, submarine);
+        new Submarine(new Vec(286, 181, 0));
+        new Cockpit();
 
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             player = event.getPlayer();
 
-            event.setSpawningInstance(cockpit.getInstance());
+            event.setSpawningInstance(Cockpit.Instance.getInstance());
             player.setRespawnPoint(new Pos(.5, 1, .5, 180, 0));
             player.setGameMode(GameMode.ADVENTURE);
         });
 
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
             // initialize the camera display to be black when player joins
-            submarine.getCamera().disableAndClearCameraMap();
-            mapManager = new MapManager();
+            Submarine.Instance.getCamera().disableAndClearCameraMap();
+
+            new MapManager();
+            new SoundManager();
 
             event.getPlayer().setSkin(PlayerSkin.fromUuid(event.getPlayer().getUuid().toString()));
         });

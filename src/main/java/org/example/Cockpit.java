@@ -24,7 +24,6 @@ import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.anvil.AnvilLoader;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.network.packet.client.play.ClientAnimationPacket;
 import net.minestom.server.network.packet.server.play.SoundEffectPacket;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.TaskSchedule;
@@ -34,10 +33,11 @@ import java.util.HashSet;
 
 public class Cockpit {
 
+    public static Cockpit Instance;
+
     public enum ButtonType {LONGITUDINAL, LATERAL}
 
     private final InstanceContainer instance;
-    private final Submarine submarine;
 
     // Buttons
     private int ticksSinceLastInput = 0;
@@ -65,28 +65,30 @@ public class Cockpit {
 
 
 
-    public Cockpit(InstanceManager manager, Submarine submarine) {
-        this.instance = manager.createInstanceContainer();
+    public Cockpit() {
+        if (Instance == null) {
+            Instance = this;
+        }
+
+        this.instance = MinecraftServer.getInstanceManager().createInstanceContainer();
         this.instance.setChunkSupplier(LightingChunk::new);
         this.instance.setChunkLoader(new AnvilLoader("worlds/cockpit_world"));
-
-        this.submarine = submarine;
 
         // FOR REFERENCE PLAYING AUDIO FROM A MOVABLE ENTITY SOURCE FOR VOLUME FADING:
         // instance.playSound(sound, entity);
 
         spawnControlButton(controlCenter.add(0.2, BUTTON_HEIGHT, 0.21), "▲",
             new Vec(2.5, 0.65, 0.65), 0.1f, 0.03f, ButtonType.LONGITUDINAL,
-            () -> submarine.setMoveState(Submarine.MoveState.FORWARD));
+            () -> Submarine.Instance.setMoveState(Submarine.MoveState.FORWARD));
         spawnControlButton(controlCenter.add(0.2, BUTTON_HEIGHT, 0.36), "▼",
             new Vec(2.5, 0.65, 0.65), 0.1f, 0.03f, ButtonType.LONGITUDINAL,
-            () -> submarine.setMoveState(Submarine.MoveState.BACKWARD));
+            () -> Submarine.Instance.setMoveState(Submarine.MoveState.BACKWARD));
         spawnControlButton(controlCenter.add(-0.15, BUTTON_HEIGHT, 0.43), "▶",
             new Vec(1, 1, 2), 0.15f, 0.03f, ButtonType.LATERAL,
-            () -> submarine.setMoveState(Submarine.MoveState.RIGHT));
+            () -> Submarine.Instance.setMoveState(Submarine.MoveState.RIGHT));
         spawnControlButton(controlCenter.add(-0.35, BUTTON_HEIGHT, 0.43), "◀",
             new Vec(1, 1, 2), 0.15f, 0.03f, ButtonType.LATERAL,
-            () -> submarine.setMoveState(Submarine.MoveState.LEFT));
+            () -> Submarine.Instance.setMoveState(Submarine.MoveState.LEFT));
         // setting moveState to NONE is handled in resetCockpitButton()
 
         spawnPositionDisplays(
@@ -195,10 +197,10 @@ public class Cockpit {
         visual.teleport(visual.getPosition().withY(controlCenter.y()+ BUTTON_PRESSED_HEIGHT));
 
         // clear the camera display when the sub moves
-        if (submarine.getCamera().getIsCameraActive()) {
-            submarine.getCamera().disableAndClearCameraMap();
-        } else if (submarine.getCamera().activePrintingTask != null) {
-            submarine.getCamera().clearPrintingTask();
+        if (Submarine.Instance.getCamera().getIsCameraActive()) {
+            Submarine.Instance.getCamera().disableAndClearCameraMap();
+        } else if (Submarine.Instance.getCamera().activePrintingTask != null) {
+            Submarine.Instance.getCamera().clearPrintingTask();
         }
 
         TextDisplayMeta visualMeta = (TextDisplayMeta)visual.getEntityMeta();
@@ -212,7 +214,7 @@ public class Cockpit {
     private void resetCockpitButton(Entity visual) {
         visual.teleport(visual.getPosition().withY(controlCenter.y()+BUTTON_HEIGHT));
 
-        submarine.setMoveState(Submarine.MoveState.NONE);
+        Submarine.Instance.setMoveState(Submarine.MoveState.NONE);
 
         TextDisplayMeta visualMeta = (TextDisplayMeta)visual.getEntityMeta();
         visualMeta.setBrightness(BUTTON_BRIGHTNESS, 0);
@@ -328,7 +330,7 @@ public class Cockpit {
 
         Main.player.swingMainHand();
 
-        submarine.takePhoto();
+        Submarine.Instance.takePhoto();
 
         cameraButtonDisabled = true;
 
@@ -354,13 +356,13 @@ public class Cockpit {
     }
 
     private void updatePositionDisplay() {
-//        String hud = submarine.getPositionText();
+//        String hud = Submarine.Instance.getPositionText();
 //        Main.player.sendActionBar(Component.text(hud));
 
         Entity[] entities = {xDisplayEntity, yDisplayEntity, angleDisplayEntity};
 
-        final double x = (submarine.getX()-5) * 4; // z is off by 5 blocks in-game
-        final double z = (submarine.getZ()-4) * 4; // x is off by 2 blocks in-game
+        final double x = (Submarine.Instance.getX()-5) * 4; // z is off by 5 blocks in-game
+        final double z = (Submarine.Instance.getZ()-4) * 4; // x is off by 2 blocks in-game
 
         for (Entity e : entities) {
             TextDisplayMeta meta = (TextDisplayMeta)e.getEntityMeta();
@@ -369,11 +371,11 @@ public class Cockpit {
             } else if (e == yDisplayEntity) {
                 meta.setText(Component.text(String.format("Y: %06.2f", z)).color(GLOWING_COLOR));
             } else if (e ==  angleDisplayEntity) {
-                meta.setText(Component.text(String.format("%06.2f", submarine.getYaw())).color(GLOWING_COLOR));
+                meta.setText(Component.text(String.format("%06.2f", Submarine.Instance.getYaw())).color(GLOWING_COLOR));
             }
         }
 
-        float convertedYaw = (360 - (float)submarine.getYaw());
+        float convertedYaw = (360 - (float)Submarine.Instance.getYaw());
         compassNeedleEntity.teleport(compassNeedleEntity.getPosition().withYaw(convertedYaw));
     }
 

@@ -13,9 +13,15 @@ import net.minestom.server.inventory.InventoryType;
 
 public class MapManager {
 
+    public static MapManager Instance;
+
     private final Inventory mapMarkerInventory;
 
     public MapManager() {
+        if (Instance == null) {
+            Instance = this;
+        }
+
         MinecraftServer.getGlobalEventHandler().addListener(PlayerSwapItemEvent.class, event -> {
             openMap();
         });

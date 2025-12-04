@@ -7,5 +7,8 @@
   },
   "open_map": {
     "sounds": [ "custom:open_map" ]
+  },
+  "submarine_move": {
+    "sounds": [ "custom:submarine_move" ]
   }
 }

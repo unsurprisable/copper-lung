@@ -14,6 +14,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class Submarine {
 
+    public static Submarine Instance;
+
     private final InstanceContainer oceanInstance;
     private final SubmarineCamera camera;
 
@@ -29,7 +31,7 @@ public class Submarine {
     private final double minMoveAccel = 0.8;
     private final double maxMoveAccel = 3.8;
     private final double moveDrag = 3.2;
-    private final int moveAccelChargeTicks = 20;
+    private final int moveAccelChargeTicks = 50;
     private final double minAngAccel = 0;
     private final double maxAngAccel = 80;
     private final double angDrag = 3;
@@ -46,6 +48,10 @@ public class Submarine {
     }
 
     public Submarine(double inGameX, double inGameZ, double yaw) {
+        if (Instance == null) {
+            Instance = this;
+        }
+
         this.oceanInstance = MinecraftServer.getInstanceManager().createInstanceContainer();
         oceanInstance.setChunkLoader(new AnvilLoader("worlds/ocean_world"));
         oceanInstance.enableAutoChunkLoad(false);
@@ -101,6 +107,8 @@ public class Submarine {
             }
             this.yaw = newYaw;
 
+            // MOVING SOUND EFFECT
+
             if (moveState != MoveState.NONE) {
                 inputHeldTicks++;
             }
@@ -138,8 +146,23 @@ public class Submarine {
     public double getYaw() {
         return yaw;
     }
-
     public SubmarineCamera getCamera() {
         return camera;
+    }
+
+    public double getMaxSpeed() {
+        return maxMoveAccel / moveDrag;
+    }
+    public double getMaxAngSpeed() {
+        return maxAngAccel / angDrag;
+    }
+
+    private double getConvertedAngularSpeed() {
+        double conversion = getMaxSpeed() / getMaxAngSpeed();
+        return Math.abs(angVelocity) * conversion;
+    }
+
+    public double getTotalSpeed() {
+        return moveVelocity.length() + getConvertedAngularSpeed();
     }
 }
