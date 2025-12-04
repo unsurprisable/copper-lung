@@ -119,7 +119,7 @@ public class SubmarineCamera {
     }
 
     private byte getSpriteFuzzyColor(int baseIndex, double distance) {
-        double blockBuffer = 1.75; // how far away for the fog to start affecting the color
+        double blockBuffer = 2; // how far away for the fog to start affecting the color
         double maxFogDistance = MAX_SPRITE_DISTANCE - blockBuffer;
 
         double adjustedDist = Math.clamp(distance - blockBuffer, 0, maxFogDistance);
@@ -132,13 +132,13 @@ public class SubmarineCamera {
         double targetIndex = baseIndex + (distRatio * (maxIndex - baseIndex));
 
         // widens the curve of the Gaussian to allow multiple shades to be picked
-        double fuzziness = 1.75 + distRatio * 2;
+        double fuzziness = 1.5 + distRatio * 2;
 
         return getFuzzyColor(targetIndex, fuzziness);
     }
 
     public static final double MAX_WALL_DISTANCE = 4.5;
-    public static final double MAX_SPRITE_DISTANCE = 3.5;
+    public static final double MAX_SPRITE_DISTANCE = 4;
     private final long PHOTO_GENERATE_TIME = 2500;
 
     public void takePhoto(Pos cameraPos) {

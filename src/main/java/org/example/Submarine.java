@@ -6,7 +6,6 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.event.instance.InstanceTickEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.InstanceContainer;
-import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.anvil.AnvilLoader;
 
 import java.util.ArrayList;
@@ -18,6 +17,8 @@ public class Submarine {
     private final InstanceContainer oceanInstance;
     private final SubmarineCamera camera;
 
+    public enum MoveState {FORWARD, BACKWARD, LEFT, RIGHT, NONE};
+    private MoveState moveState  = MoveState.NONE;
 
     private double x;
     private double z;
@@ -25,10 +26,17 @@ public class Submarine {
     private int moveDirection = 0;
     private int rotateDirection = 0;
 
-    private final double moveAccel = 3.0;
-    private final double angAccel = 85;
-    private final double moveDrag = 2.8;
-    private final double angDrag = 5.5;
+    private final double minMoveAccel = 0.8;
+    private final double maxMoveAccel = 3.8;
+    private final double moveDrag = 3.2;
+    private final int moveAccelChargeTicks = 20;
+    private final double minAngAccel = 0;
+    private final double maxAngAccel = 80;
+    private final double angDrag = 3;
+    private final int angAccelChargeTicks = 100;
+
+    private int inputHeldTicks = 0;
+    final double tickDeltaTime = 1.0/20.0;
 
     private Vec moveVelocity =  new Vec(0,0);
     private double angVelocity = 0;
@@ -55,55 +63,48 @@ public class Submarine {
         this.yaw = yaw;
 
         this.oceanInstance.eventNode().addListener(InstanceTickEvent.class, event -> {
-            double deltaTime = (double)event.getDuration() / 1000d;
+            moveDirection = moveState == MoveState.FORWARD ? 1 : moveState == MoveState.BACKWARD ? -1 : 0;
+            rotateDirection = moveState == MoveState.LEFT ? 1 : moveState == MoveState.RIGHT ? -1 : 0;
 
             // ACCELERATION
+            double easingRatio = Math.clamp((double)inputHeldTicks/ moveAccelChargeTicks, 0.0, 1.0);
+            double finalMoveAccel = (maxMoveAccel - minMoveAccel) * Math.pow(easingRatio, 2) + minMoveAccel;
 
             final Vec moveDragForce = this.moveVelocity.mul(-moveDrag);
             final Vec moveInputForce = new Vec(Math.cos(Math.toRadians(this.yaw)), Math.sin(Math.toRadians(this.yaw)))
-                .mul(moveDirection * moveAccel);
+                .mul(moveDirection * finalMoveAccel);
             final Vec netMoveForce = moveInputForce.add(moveDragForce);
 
-            this.moveVelocity = this.moveVelocity.add(netMoveForce.mul(deltaTime));
+            this.moveVelocity = this.moveVelocity.add(netMoveForce.mul(tickDeltaTime));
+
+            easingRatio = Math.clamp((double)inputHeldTicks/ angAccelChargeTicks, 0.0, 1.0);
+            double finalAngAccel = (maxAngAccel - minAngAccel) * Math.pow(easingRatio, 0.9) + minAngAccel;
 
             final double angDragForce = this.angVelocity * -angDrag;
-            final double angInputForce = this.rotateDirection * this.angAccel;
+            final double angInputForce = this.rotateDirection * finalAngAccel;
             final double netAngForce =  angDragForce + angInputForce;
 
-            this.angVelocity += netAngForce * deltaTime;
+            this.angVelocity += netAngForce * tickDeltaTime;
 
             // VELOCITY
-            double newX = this.x + this.moveVelocity.x() * deltaTime;
-            double newZ = this.z + this.moveVelocity.z() * deltaTime;
+            double newX = this.x + this.moveVelocity.x() * tickDeltaTime;
+            double newZ = this.z + this.moveVelocity.z() * tickDeltaTime;
 
             // need to check for collisions first
 
             this.x = newX;
             this.z = newZ;
 
-            double newYaw = (this.yaw + angVelocity * deltaTime) % 360;
+            double newYaw = (this.yaw + angVelocity * tickDeltaTime) % 360;
             if (newYaw < 0) {
                 newYaw += 360;
             }
             this.yaw = newYaw;
 
-            moveDirection = 0;
-            rotateDirection = 0;
+            if (moveState != MoveState.NONE) {
+                inputHeldTicks++;
+            }
         });
-    }
-
-    /**
-     * @param direction is either 1 or -1
-     */
-    public void move(int direction) {
-        moveDirection = direction;
-    }
-
-    /**
-     * @param direction is either 1 or -1
-     */
-    public void rotate(int direction) {
-        rotateDirection = direction;
     }
 
     private void preloadOceanInstance(int size) {
@@ -121,6 +122,11 @@ public class Submarine {
 
     public void takePhoto() {
         camera.takePhoto(new Pos(z, 0, x, -(float)yaw, 0));
+    }
+
+    public void setMoveState(MoveState state) {
+        inputHeldTicks = 0;
+        moveState = state;
     }
 
     public double getX() {

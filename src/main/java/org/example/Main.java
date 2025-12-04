@@ -5,6 +5,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerSkin;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
@@ -27,9 +28,6 @@ public class Main {
 
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
-//            if (player != null) {
-//                event.getPlayer().kick(Component.text("Map has already been generated! Restart the server to rejoin.").color(NamedTextColor.RED));
-//            }
             player = event.getPlayer();
 
             event.setSpawningInstance(cockpit.getInstance());
@@ -42,11 +40,7 @@ public class Main {
             submarine.getCamera().disableAndClearCameraMap();
             mapManager = new MapManager();
 
-//            Main.player.playSound(Sound.sound(
-//                Key.key("custom:dark_bramble"),
-//                Sound.Source.MASTER,
-//                10f, 1f
-//            ));
+            event.getPlayer().setSkin(PlayerSkin.fromUuid(event.getPlayer().getUuid().toString()));
         });
 
         server.start("localhost", 25565);

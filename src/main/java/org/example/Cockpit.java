@@ -24,6 +24,7 @@ import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.anvil.AnvilLoader;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.network.packet.client.play.ClientAnimationPacket;
 import net.minestom.server.network.packet.server.play.SoundEffectPacket;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.TaskSchedule;
@@ -32,9 +33,6 @@ import net.minestom.server.utils.Direction;
 import java.util.HashSet;
 
 public class Cockpit {
-
-    public enum MoveState {FORWARD, BACKWARD, LEFT, RIGHT, NONE};
-    private MoveState moveState  = MoveState.NONE;
 
     public enum ButtonType {LONGITUDINAL, LATERAL}
 
@@ -79,16 +77,17 @@ public class Cockpit {
 
         spawnControlButton(controlCenter.add(0.2, BUTTON_HEIGHT, 0.21), "▲",
             new Vec(2.5, 0.65, 0.65), 0.1f, 0.03f, ButtonType.LONGITUDINAL,
-            () -> moveState = MoveState.FORWARD);
+            () -> submarine.setMoveState(Submarine.MoveState.FORWARD));
         spawnControlButton(controlCenter.add(0.2, BUTTON_HEIGHT, 0.36), "▼",
             new Vec(2.5, 0.65, 0.65), 0.1f, 0.03f, ButtonType.LONGITUDINAL,
-            () -> moveState = MoveState.BACKWARD);
+            () -> submarine.setMoveState(Submarine.MoveState.BACKWARD));
         spawnControlButton(controlCenter.add(-0.15, BUTTON_HEIGHT, 0.43), "▶",
             new Vec(1, 1, 2), 0.15f, 0.03f, ButtonType.LATERAL,
-            () -> moveState = MoveState.RIGHT);
+            () -> submarine.setMoveState(Submarine.MoveState.RIGHT));
         spawnControlButton(controlCenter.add(-0.35, BUTTON_HEIGHT, 0.43), "◀",
             new Vec(1, 1, 2), 0.15f, 0.03f, ButtonType.LATERAL,
-            () -> moveState = MoveState.LEFT);
+            () -> submarine.setMoveState(Submarine.MoveState.LEFT));
+        // setting moveState to NONE is handled in resetCockpitButton()
 
         spawnPositionDisplays(
             new Vec(0.375, 0.55, 0.375),
@@ -109,27 +108,8 @@ public class Cockpit {
         this.instance.eventNode().addListener(InstanceTickEvent.class, event -> {
             tickButtonReset();
             ticksSinceLastInput++;
-
             updatePositionDisplay();
-
-            switch (moveState) {
-                case FORWARD:
-                    submarine.move(1);
-                    break;
-                case BACKWARD:
-                    submarine.move(-1);
-                    break;
-                case LEFT:
-                    submarine.rotate(1);
-                    break;
-                case RIGHT:
-                    submarine.rotate(-1);
-                    break;
-                default:
-                    break;
-            }
         });
-
     }
 
     private void spawnControlButton(Pos pos, String icon, Vec scale, float width, float height, ButtonType buttonType, Runnable action) {
@@ -190,11 +170,10 @@ public class Cockpit {
 
            if (currentPressedButton == visual) return;
 
-           action.run();
-
            if (currentPressedButton != null) {
-               resetButtonVisual(currentPressedButton);
-           }
+                resetCockpitButton(currentPressedButton);
+            }
+           action.run();
 
             pressCockpitButton(visual);
             currentPressedButton = visual;
@@ -207,17 +186,13 @@ public class Cockpit {
 
         int maxTickBufferTime = 5;
         if (ticksSinceLastInput >= maxTickBufferTime) {
-            resetButtonVisual(currentPressedButton);
+            resetCockpitButton(currentPressedButton);
             currentPressedButton = null;
-            moveState = MoveState.NONE;
         }
     }
 
     private void pressCockpitButton(Entity visual) {
         visual.teleport(visual.getPosition().withY(controlCenter.y()+ BUTTON_PRESSED_HEIGHT));
-
-        TextDisplayMeta visualMeta = (TextDisplayMeta)visual.getEntityMeta();
-        visualMeta.setBrightness(BUTTON_PRESSED_BRIGHTNESS, 0);
 
         // clear the camera display when the sub moves
         if (submarine.getCamera().getIsCameraActive()) {
@@ -226,13 +201,18 @@ public class Cockpit {
             submarine.getCamera().clearPrintingTask();
         }
 
+        TextDisplayMeta visualMeta = (TextDisplayMeta)visual.getEntityMeta();
+        visualMeta.setBrightness(BUTTON_PRESSED_BRIGHTNESS, 0);
+
         SoundEffectPacket clickSound = new SoundEffectPacket(SoundEvent.BLOCK_STONE_BUTTON_CLICK_ON, Sound.Source.BLOCK, visual.getPosition(), 0.3f, 1.5f, 0);
 
         Main.player.sendPacket(clickSound);
     }
 
-    private void resetButtonVisual(Entity visual) {
+    private void resetCockpitButton(Entity visual) {
         visual.teleport(visual.getPosition().withY(controlCenter.y()+BUTTON_HEIGHT));
+
+        submarine.setMoveState(Submarine.MoveState.NONE);
 
         TextDisplayMeta visualMeta = (TextDisplayMeta)visual.getEntityMeta();
         visualMeta.setBrightness(BUTTON_BRIGHTNESS, 0);
@@ -272,7 +252,6 @@ public class Cockpit {
 
         TextDisplayMeta compMeta =  (TextDisplayMeta) compassNeedleEntity.getEntityMeta();
 
-        // ⬤ ▶
         compMeta.setAlignment(TextDisplayMeta.Alignment.CENTER);
         compMeta.setText(Component.text("▶").color(GLOWING_COLOR));
         compMeta.setBillboardRenderConstraints(AbstractDisplayMeta.BillboardConstraints.FIXED);
@@ -346,6 +325,8 @@ public class Cockpit {
             1.0f
             );
         Main.player.playSound(photoSound, 1.5, 2.5, 2.999);
+
+        Main.player.swingMainHand();
 
         submarine.takePhoto();
 
