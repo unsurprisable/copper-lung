@@ -2,7 +2,6 @@ package org.example;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -22,6 +21,7 @@ public class SubmarineMoveSFX {
     private final InstanceContainer instance;
 
     private final double MAX_SPEED = Submarine.Instance.getMaxSpeed();
+    private final double MIN_DISTANCE = 6;
     private final double MAX_DISTANCE = 16;
     private final float VOLUME = 0.75f;
     private final int SOUND_DIRECTIONS = 4;
@@ -73,8 +73,8 @@ public class SubmarineMoveSFX {
     }
 
     public void setVolumeFromSpeed(double speed) {
-        double conversion = MAX_DISTANCE / MAX_SPEED;
-        double distance = MAX_DISTANCE - (speed * conversion);
+        double conversion = (MAX_DISTANCE - MIN_DISTANCE) / MAX_SPEED;
+        double distance = (MAX_DISTANCE) - (speed * conversion);
 
         emitterEntities.get(0).teleport(origin.add(0, 0,  -distance));
         emitterEntities.get(1).teleport(origin.add(0, 0,  distance));

@@ -4,7 +4,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.inventory.AbstractInventory;
-import net.minestom.server.inventory.Inventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
@@ -60,10 +59,10 @@ public class MapMarkerItem {
     public boolean getIsCompleted() {
         return isCompleted;
     }
-    public int getX() {
+    public int getMapX() {
         return x;
     }
-    public int getY() {
+    public int getMapY() {
         return y;
     }
     public int getYaw() {

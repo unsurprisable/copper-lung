@@ -317,7 +317,7 @@ public class Cockpit {
 
     private void pressCameraButton(Entity button) {
         cameraButtonDisabled = true;
-        Main.player.playSound(SoundManager.TAKE_PHOTO, 1.5, 2.5, 2.999);
+        SoundManager.play(SoundManager.TAKE_PHOTO, new Vec(1.5, 2.5, 2.999));
 
         Main.player.swingMainHand();
 
@@ -349,8 +349,6 @@ public class Cockpit {
     }
 
     private void updatePositionDisplay() {
-//        String hud = Submarine.Instance.getPositionText();
-//        Main.player.sendActionBar(Component.text(hud));
 
         Entity[] entities = {xDisplayEntity, yDisplayEntity, angleDisplayEntity};
 

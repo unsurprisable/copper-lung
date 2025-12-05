@@ -3,6 +3,7 @@ package org.example;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.event.instance.InstanceTickEvent;
 import net.minestom.server.sound.SoundEvent;
 
@@ -24,6 +25,16 @@ public class SoundManager {
         });
     }
 
+
+    // --- SOUNDTRACKS ---
+    public static Sound DARK_BRAMBLE = Sound.sound(
+        Key.key("custom:dark_bramble"),
+        Sound.Source.MASTER,
+        1.0f, 1.0f
+    );
+
+
+    // --- SOUND EFFECTS ---
     public static Sound OPEN_MAP = Sound.sound(
         Key.key("custom:open_map"),
         Sound.Source.MASTER,
@@ -50,4 +61,15 @@ public class SoundManager {
         Sound.Source.MASTER,
         1.0f, 1.0f
     );
+
+
+    public static void play(Sound sound) {
+        Main.player.playSound(sound);
+    }
+    public static void play(Sound sound, Point point) {
+        Main.player.playSound(sound, point);
+    }
+    public static void play(Sound sound, Sound.Emitter emitter) {
+        Main.player.playSound(sound, emitter);
+    }
 }

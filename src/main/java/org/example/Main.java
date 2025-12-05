@@ -9,7 +9,6 @@ import net.minestom.server.entity.PlayerSkin;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
-import net.minestom.server.instance.InstanceManager;
 
 public class Main {
 
@@ -18,7 +17,6 @@ public class Main {
     static void main() {
 
         MinecraftServer server = MinecraftServer.init();
-        InstanceManager instanceManager = MinecraftServer.getInstanceManager();
 
         new Submarine(new Vec(286, 181, 0));
         new Cockpit();
@@ -40,6 +38,7 @@ public class Main {
 
             new MapManager();
             new SoundManager();
+            new ProgressionManager();
 
             event.getPlayer().setSkin(PlayerSkin.fromUuid(event.getPlayer().getUuid().toString()));
         });

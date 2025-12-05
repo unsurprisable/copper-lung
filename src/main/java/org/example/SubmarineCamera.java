@@ -24,13 +24,11 @@ public class SubmarineCamera {
 
     public SubmarineCamera(InstanceContainer oceanInstance) {
         this.oceanInstance = oceanInstance;
-
-        SpriteTexture seaweed = SpriteTexture.testPattern(10);
     }
 
     public static class ColorPalette {
         public static final byte[] PALETTE_COLORS = {
-            (byte) 34,  // White (255)      @ 100% (255)  0
+            (byte) 33,  // White (255)      @ 100% (255)  0 // EDITED: used to be (34) but removed since true white stands out too much
             (byte) 33,  // White (255)      @ 86%  (219)  1
             (byte) 32,  // White (255)      @ 71%  (181)  2
             (byte) 26,  // Lt Gray (167)    @ 100% (167)  3
@@ -108,18 +106,18 @@ public class SubmarineCamera {
         double fogCurve = .45;
         distRatio = Math.pow(distRatio, fogCurve);
 
-        int minIndex = 14;
-        int maxIndex = PALETTE_COLORS.length - 1 - 1;
+        int minIndex = 20;
+        int maxIndex = PALETTE_COLORS.length - 1;
         double targetIndex = distRatio * (maxIndex - minIndex) + minIndex;
 
         // widens the curve of the Gaussian to allow multiple shades to be picked
-        double fuzziness = 1.2 + ((1-distRatio) * .75);
+        double fuzziness = 2 + ((1-distRatio) * 1.75);
 
         return getFuzzyColor(targetIndex, fuzziness);
     }
 
     private byte getSpriteFuzzyColor(int baseIndex, double distance) {
-        double blockBuffer = 2; // how far away for the fog to start affecting the color
+        double blockBuffer = 1; // how far away for the fog to start affecting the color
         double maxFogDistance = MAX_SPRITE_DISTANCE - blockBuffer;
 
         double adjustedDist = Math.clamp(distance - blockBuffer, 0, maxFogDistance);

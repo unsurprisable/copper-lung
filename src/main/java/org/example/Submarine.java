@@ -1,5 +1,6 @@
 package org.example;
 
+import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -39,17 +40,20 @@ public class Submarine {
     private final double angDrag = 3;
     private final int angAccelChargeTicks = 100;
 
+
     private int inputHeldTicks = 0;
     final double tickDeltaTime = 1.0/20.0;
 
-    private Vec moveVelocity =  new Vec(0,0);
+    private Vec moveVelocity =  Vec.ZERO;
+    private final double moveVelocityCutoffSqr = 0.005;
     private double angVelocity = 0;
+    private final double angVelocityCutoff = 0.4;
 
     public Submarine(Vec startPos) {
-        this(UnitConvert.fromYToX(startPos.y()), UnitConvert.fromXToZ(startPos.x()), startPos.z());
+        this(UnitConvert.fromMapYToWorldX(startPos.y()), UnitConvert.fromMapXToWorldZ(startPos.x()), startPos.z());
     }
 
-    public Submarine(double inGameX, double inGameZ, double yaw) {
+    public Submarine(double worldX, double worldZ, double yaw) {
         if (Instance == null) {
             Instance = this;
         }
@@ -66,8 +70,8 @@ public class Submarine {
 
         this.camera = new SubmarineCamera(this.oceanInstance);
 
-        this.x = inGameZ;
-        this.z = inGameX;
+        this.x = worldZ;
+        this.z = worldX;
         this.yaw = yaw;
 
         this.oceanInstance.eventNode().addListener(InstanceTickEvent.class, event -> {
@@ -84,6 +88,9 @@ public class Submarine {
             final Vec netMoveForce = moveInputForce.add(moveDragForce);
 
             this.moveVelocity = this.moveVelocity.add(netMoveForce.mul(tickDeltaTime));
+            if (!(moveState == MoveState.FORWARD || moveState == MoveState.BACKWARD) && moveVelocity.lengthSquared() <= moveVelocityCutoffSqr) {
+                moveVelocity = Vec.ZERO;
+            }
 
             easingRatio = Math.clamp((double)inputHeldTicks/ angAccelChargeTicks, 0.0, 1.0);
             double finalAngAccel = (maxAngAccel - minAngAccel) * Math.pow(easingRatio, 0.9) + minAngAccel;
@@ -93,21 +100,32 @@ public class Submarine {
             final double netAngForce =  angDragForce + angInputForce;
 
             this.angVelocity += netAngForce * tickDeltaTime;
+            if (!(moveState == MoveState.LEFT || moveState == MoveState.RIGHT) && Math.abs(angVelocity) <= angVelocityCutoff) {
+                angVelocity = 0;
+            }
 
             // VELOCITY
-            double newX = this.x + this.moveVelocity.x() * tickDeltaTime;
-            double newZ = this.z + this.moveVelocity.z() * tickDeltaTime;
+            if (!moveVelocity.equals(Vec.ZERO) || angVelocity != 0) {
+                double newX = this.x + this.moveVelocity.x() * tickDeltaTime;
+                double newZ = this.z + this.moveVelocity.z() * tickDeltaTime;
 
-            // need to check for collisions first
+                // need to check for collisions first
 
-            this.x = newX;
-            this.z = newZ;
+                this.x = newX;
+                this.z = newZ;
 
-            double newYaw = (this.yaw + angVelocity * tickDeltaTime) % 360;
-            if (newYaw < 0) {
-                newYaw += 360;
+                double newYaw = (this.yaw + angVelocity * tickDeltaTime) % 360;
+                if (newYaw < 0) {
+                    newYaw += 360;
+                }
+                this.yaw = newYaw;
+
+                ProgressionManager.Instance.onSubmarinePositionChange(
+                    UnitConvert.fromWorldZToMapX(this.x),
+                    UnitConvert.fromWorldXToMapY(this.z),
+                    this.yaw
+                );
             }
-            this.yaw = newYaw;
 
             if (moveState != MoveState.NONE) {
                 inputHeldTicks++;
@@ -175,11 +193,13 @@ public class Submarine {
     public void teleport(double mapX, double mapY, double newYaw) {
         moveVelocity = Vec.ZERO;
         angVelocity = 0;
-        this.x = UnitConvert.fromXToZ(mapX); // why is it actually going to X instead of Z???????????
-        this.z = UnitConvert.fromYToX(mapY); // (this is necessary for it to work, but like what????)
+        this.x = UnitConvert.fromMapXToWorldZ(mapX);
+        this.z = UnitConvert.fromMapYToWorldX(mapY);
         this.yaw = newYaw;
-        Main.player.playSound(SoundManager.TELEPORT);
+        SoundManager.play(SoundManager.TELEPORT);
         Main.player.addEffect(new Potion(PotionEffect.BLINDNESS, 255, 25));
         new Screenshake(5);
+        camera.clearPrintingTask();
+        camera.disableAndClearCameraMap();
     }
 }
