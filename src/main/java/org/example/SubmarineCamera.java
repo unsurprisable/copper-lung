@@ -207,7 +207,7 @@ public class SubmarineCamera {
 
             Pos rayPos = cameraPos.withYaw((float)(cameraPos.yaw() + relativeAngle));
 
-            double rawDistance = scan(rayPos);
+            double rawDistance = scanForBlocks(rayPos, MAX_WALL_DISTANCE, 1000);
             if (rawDistance == -1) continue; //nothing
 
             zBuffer[x] = rawDistance;
@@ -262,12 +262,12 @@ public class SubmarineCamera {
         }, TaskSchedule.millis(timeUntilPhotoPrinted), TaskSchedule.stop());
     }
 
-    private double scan(Pos origin) {
-        final double stepSize = MAX_WALL_DISTANCE /1000;
+    public double scanForBlocks(Pos origin, double maxDistance, int steps) {
+        final double stepSize = maxDistance / steps;
 
         Vec direction = origin.direction();
 
-        for (double dist = 0; dist < MAX_WALL_DISTANCE; dist += stepSize) {
+        for (double dist = 0; dist < maxDistance; dist += stepSize) {
             Pos checkPos = origin.add(direction.mul(dist));
 
             Block block = oceanInstance.getBlock(checkPos);

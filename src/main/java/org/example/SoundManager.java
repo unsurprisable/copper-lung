@@ -61,15 +61,23 @@ public class SoundManager {
         Sound.Source.MASTER,
         1.0f, 1.0f
     );
+    public static Sound PROXIMITY = Sound.sound(
+        Key.key("custom:proximity"),
+        Sound.Source.MASTER,
+        0.9f, 1.0f
+    );
 
 
     public static void play(Sound sound) {
+        if (Main.player == null) return;
         Main.player.playSound(sound);
     }
     public static void play(Sound sound, Point point) {
+        if (Main.player == null) return;
         Main.player.playSound(sound, point);
     }
     public static void play(Sound sound, Sound.Emitter emitter) {
+        if (Main.player == null) return;
         Main.player.playSound(sound, emitter);
     }
 }

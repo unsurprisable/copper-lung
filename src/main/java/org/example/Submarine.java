@@ -1,6 +1,5 @@
 package org.example;
 
-import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -8,6 +7,7 @@ import net.minestom.server.event.instance.InstanceTickEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.anvil.AnvilLoader;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 
@@ -25,21 +25,20 @@ public class Submarine {
     public enum MoveState {FORWARD, BACKWARD, LEFT, RIGHT, NONE};
     private MoveState moveState  = MoveState.NONE;
 
-    private double x;
-    private double z;
+    private double subX;
+    private double subZ;
     private double yaw;
     private int moveDirection = 0;
     private int rotateDirection = 0;
 
     private final double minMoveAccel = 0.5;
-    private final double maxMoveAccel = 4.8;
+    private final double maxMoveAccel = 4;
     private final double moveDrag = 3.2;
     private final int moveAccelChargeTicks = 50;
     private final double minAngAccel = 0;
     private final double maxAngAccel = 80;
     private final double angDrag = 3;
     private final int angAccelChargeTicks = 100;
-
 
     private int inputHeldTicks = 0;
     final double tickDeltaTime = 1.0/20.0;
@@ -49,8 +48,10 @@ public class Submarine {
     private double angVelocity = 0;
     private final double angVelocityCutoff = 0.4;
 
+    public static final double HITBOX_RADIUS = 0.25;
+
     public Submarine(Vec startPos) {
-        this(UnitConvert.fromMapYToWorldX(startPos.y()), UnitConvert.fromMapXToWorldZ(startPos.x()), startPos.z());
+        this(UnitConvert.mapYToWorldX(startPos.y()), UnitConvert.mapXToWorldZ(startPos.x()), startPos.z());
     }
 
     public Submarine(double worldX, double worldZ, double yaw) {
@@ -70,8 +71,8 @@ public class Submarine {
 
         this.camera = new SubmarineCamera(this.oceanInstance);
 
-        this.x = worldZ;
-        this.z = worldX;
+        this.subX = worldZ;
+        this.subZ = worldX;
         this.yaw = yaw;
 
         this.oceanInstance.eventNode().addListener(InstanceTickEvent.class, event -> {
@@ -106,13 +107,22 @@ public class Submarine {
 
             // VELOCITY
             if (!moveVelocity.equals(Vec.ZERO) || angVelocity != 0) {
-                double newX = this.x + this.moveVelocity.x() * tickDeltaTime;
-                double newZ = this.z + this.moveVelocity.z() * tickDeltaTime;
+                double newX = this.subX + this.moveVelocity.x() * tickDeltaTime;
+                double newZ = this.subZ + this.moveVelocity.z() * tickDeltaTime;
 
                 // need to check for collisions first
+                if (checkForCollision(newX, newZ)) {
+                    // cancel movement, reset velocity to 0
+                    setMoveState(MoveState.NONE);
+                    moveVelocity = Vec.ZERO;
+                    newX = this.subX;
+                    newZ = this.subZ;
 
-                this.x = newX;
-                this.z = newZ;
+                    SoundManager.play(SoundManager.METAL_BANG);
+                }
+
+                this.subX = newX;
+                this.subZ = newZ;
 
                 double newYaw = (this.yaw + angVelocity * tickDeltaTime) % 360;
                 if (newYaw < 0) {
@@ -121,11 +131,13 @@ public class Submarine {
                 this.yaw = newYaw;
 
                 ProgressionManager.Instance.onSubmarinePositionChange(
-                    UnitConvert.fromWorldZToMapX(this.x),
-                    UnitConvert.fromWorldXToMapY(this.z),
+                    UnitConvert.worldZToMapX(this.subX),
+                    UnitConvert.worldXToMapY(this.subZ),
                     this.yaw
                 );
             }
+
+            CollisionScanner.Instance.searchForCollisions(UnitConvert.subToWorldPos(subX, subZ, yaw));
 
             if (moveState != MoveState.NONE) {
                 inputHeldTicks++;
@@ -141,13 +153,26 @@ public class Submarine {
                 futures.add(oceanInstance.loadChunk(x, z));
             }
         }
-
-        // blocks execution until all chunks are loaded
+        // blocks program execution until all chunks are loaded
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
 
     public void takePhoto() {
-        camera.takePhoto(new Pos(z, 0, x, -(float)yaw, 0));
+        camera.takePhoto(UnitConvert.subToWorldPos(subX, subZ, yaw));
+    }
+
+    private boolean checkForCollision(double newX, double newY) {
+        Pos worldPos = UnitConvert.subToWorldPos(newX, newY, 0);
+
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                Pos cornerPos = worldPos.add(i * HITBOX_RADIUS, 0, j * HITBOX_RADIUS);
+                if (oceanInstance.getBlock(cornerPos).compare(Block.COBBLED_DEEPSLATE)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void setMoveState(MoveState state) {
@@ -155,17 +180,11 @@ public class Submarine {
         moveState = state;
     }
 
-    public double getX() {
-        return x;
-    }
     public double getMapX() {
-        return (x - 5) * 4;
-    }
-    public double getZ() {
-        return z;
+        return (subX - 5) * 4;
     }
     public double getMapY() {
-        return (z - 4) * 4;
+        return (subZ - 4) * 4;
     }
     public double getYaw() {
         return yaw;
@@ -193,8 +212,8 @@ public class Submarine {
     public void teleport(double mapX, double mapY, double newYaw) {
         moveVelocity = Vec.ZERO;
         angVelocity = 0;
-        this.x = UnitConvert.fromMapXToWorldZ(mapX);
-        this.z = UnitConvert.fromMapYToWorldX(mapY);
+        this.subX = UnitConvert.mapXToWorldZ(mapX);
+        this.subZ = UnitConvert.mapYToWorldX(mapY);
         this.yaw = newYaw;
         SoundManager.play(SoundManager.TELEPORT);
         Main.player.addEffect(new Potion(PotionEffect.BLINDNESS, 255, 25));

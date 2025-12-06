@@ -20,8 +20,6 @@ public class ProgressionManager {
     public void objectiveCollected() {
         objectiveAmount++;
 
-        Main.player.sendMessage(Component.text(objectiveAmount));
-
         switch (objectiveAmount) {
             case 1:
                 break;

@@ -18,21 +18,23 @@ public class Main {
 
         MinecraftServer server = MinecraftServer.init();
 
-        new Submarine(new Vec(286, 181, 0));
+        new Submarine(new Vec(152.30, 116.73, 90));
         new Cockpit();
 
         MinecraftServer.getCommandManager().register(new TeleportCommand());
 
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
-            player = event.getPlayer();
+            Player configPlayer = event.getPlayer();
 
             event.setSpawningInstance(Cockpit.Instance.getInstance());
-            player.setRespawnPoint(new Pos(.5, 1, .5, 180, 0));
-            player.setGameMode(GameMode.ADVENTURE);
+            configPlayer.setRespawnPoint(new Pos(.5, 1, .5, 180, 0));
+            configPlayer.setGameMode(GameMode.ADVENTURE);
         });
 
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
+            player = event.getPlayer();
+
             // initialize the camera display to be black when player joins
             Submarine.Instance.getCamera().disableAndClearCameraMap();
 

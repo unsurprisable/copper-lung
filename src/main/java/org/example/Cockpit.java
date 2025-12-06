@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.component.DataComponents;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -56,11 +57,11 @@ public class Cockpit {
     private final TextColor BUTTON_COLOR = NamedTextColor.GRAY; //TextColor.color(215, 255, 255);
     private final int BUTTON_BRIGHTNESS = 10;
     private final int BUTTON_PRESSED_BRIGHTNESS = 8;
-    private final double BUTTON_HEIGHT = 0.025;
+    public static final double BUTTON_HEIGHT = 0.025;
     private final double BUTTON_PRESSED_HEIGHT = 0.01;
 
-    private final TextColor GLOWING_COLOR = TextColor.color(185, 220, 93);
-    private final int GLOWING_BRIGHTNESS = 13;
+    public static final TextColor GLOWING_COLOR = TextColor.color(185, 220, 93);
+    public static final int GLOWING_BRIGHTNESS = 13;
 
 
 
@@ -87,6 +88,7 @@ public class Cockpit {
             () -> Submarine.Instance.setMoveState(Submarine.MoveState.LEFT));
         // setting moveState to NONE is handled in resetCockpitButton()
 
+        new CollisionScanner();
         spawnPositionDisplays(
             new Vec(0.375, 0.55, 0.375),
             new Pos(0.233, 0, -0.21),
@@ -270,8 +272,10 @@ public class Cockpit {
         compassBackMeta.setHasNoGravity(true);
         compassBackMeta.setBackgroundColor(0);
 
-        compassBack.setInstance(instance,  controlCenter.add(compassOffset)
-            .add(-0.197, 0, 0.115).withYaw(45));
+        Pos compassBackOrigin = controlCenter.add(compassOffset).add(-0.197, 0, 0.115).withYaw(45);
+        compassBack.setInstance(instance, compassBackOrigin);
+
+        CollisionScanner.Instance.spawnDisplayEntities(compassBackOrigin);
     }
 
     private void spawnCameraButton(Vec scale, Pos pos) {

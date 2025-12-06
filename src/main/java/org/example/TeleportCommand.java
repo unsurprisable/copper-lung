@@ -24,7 +24,6 @@ public class TeleportCommand extends Command {
                 case 10 -> MapManager.Instance.OBJECTIVE_10;
                 default -> null;
             };
-            System.out.println("objective");
             Submarine.Instance.teleport(obj.getMapX(), obj.getMapY(), obj.getYaw());
         }, objective);
 
