@@ -131,13 +131,13 @@ public class Submarine {
                 this.yaw = newYaw;
 
                 ProgressionManager.Instance.onSubmarinePositionChange(
-                    UnitConvert.worldZToMapX(this.subX),
+                    this, UnitConvert.worldZToMapX(this.subX),
                     UnitConvert.worldXToMapY(this.subZ),
                     this.yaw
                 );
             }
 
-            CollisionScanner.Instance.searchForCollisions(UnitConvert.subToWorldPos(subX, subZ, yaw));
+            CollisionScanner.Instance.searchForCollisions(this.getWorldPosition());
 
             if (moveState != MoveState.NONE) {
                 inputHeldTicks++;
@@ -158,7 +158,7 @@ public class Submarine {
     }
 
     public void takePhoto() {
-        camera.takePhoto(UnitConvert.subToWorldPos(subX, subZ, yaw));
+        camera.takePhoto(this.getWorldPosition());
     }
 
     private boolean checkForCollision(double newX, double newY) {
@@ -189,6 +189,9 @@ public class Submarine {
     public double getYaw() {
         return yaw;
     }
+    public Pos getWorldPosition() {
+        return UnitConvert.subToWorldPos(subX, subZ, yaw);
+    }
     public SubmarineCamera getCamera() {
         return camera;
     }
@@ -212,6 +215,7 @@ public class Submarine {
     public void teleport(double mapX, double mapY, double newYaw) {
         moveVelocity = Vec.ZERO;
         angVelocity = 0;
+        setMoveState(MoveState.NONE);
         this.subX = UnitConvert.mapXToWorldZ(mapX);
         this.subZ = UnitConvert.mapYToWorldX(mapY);
         this.yaw = newYaw;

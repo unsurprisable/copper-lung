@@ -18,7 +18,7 @@ public class Main {
 
         MinecraftServer server = MinecraftServer.init();
 
-        new Submarine(new Vec(152.30, 116.73, 90));
+        new Submarine(new Vec(152.30, 120.82, 90));
         new Cockpit();
 
         MinecraftServer.getCommandManager().register(new TeleportCommand());

@@ -13,12 +13,10 @@ import java.util.ArrayList;
 public class SubmarineMoveSFX {
 
     private final double soundLength = 26.0;
-    private double soundLengthLeft = soundLength;
+    private double soundLengthLeft = 0;
 
     private final ArrayList<Entity> emitterEntities;
     private final Sound sound;
-
-    private final InstanceContainer instance;
 
     private final double MAX_SPEED = Submarine.Instance.getMaxSpeed();
     private final double MIN_DISTANCE = 6;
@@ -26,11 +24,9 @@ public class SubmarineMoveSFX {
     private final float VOLUME = 0.75f;
     private final int SOUND_DIRECTIONS = 4;
 
-    private final Pos origin = new Pos(0.5, 1.5, -1.5);
+    private Pos playerPos = new Pos(0, 0, 32);
 
     public SubmarineMoveSFX(InstanceContainer instance) {
-        this.instance = instance;
-
         sound = Sound.sound(
             Key.key("custom:submarine_move"),
             Sound.Source.MASTER,
@@ -48,11 +44,10 @@ public class SubmarineMoveSFX {
             meta.setHasNoGravity(true);
             meta.setMarker(true);
             meta.setInvisible(true);
-            e.setInstance(instance, origin);
+            e.setInstance(instance, playerPos);
         }
 
         setVolumeFromSpeed(0);
-        playSound();
     }
 
     public void update(int deltaTimeMillis) {
@@ -63,12 +58,13 @@ public class SubmarineMoveSFX {
             soundLengthLeft = soundLength;
         }
 
+        playerPos = Main.player.getPosition();
         setVolumeFromSpeed(Submarine.Instance.getTotalSpeed());
     }
 
     private void playSound() {
         for (Entity e : emitterEntities) {
-            instance.playSound(sound, e);
+            SoundManager.play(sound, e);
         }
     }
 
@@ -76,9 +72,9 @@ public class SubmarineMoveSFX {
         double conversion = (MAX_DISTANCE - MIN_DISTANCE) / MAX_SPEED;
         double distance = (MAX_DISTANCE) - (speed * conversion);
 
-        emitterEntities.get(0).teleport(origin.add(0, 0,  -distance));
-        emitterEntities.get(1).teleport(origin.add(0, 0,  distance));
-        emitterEntities.get(2).teleport(origin.add(-distance, 0,  0));
-        emitterEntities.get(3).teleport(origin.add(distance, 0,  0));
+        emitterEntities.get(0).teleport(playerPos.add(0, 0,  -distance));
+        emitterEntities.get(1).teleport(playerPos.add(0, 0,  distance));
+        emitterEntities.get(2).teleport(playerPos.add(-distance, 0,  0));
+        emitterEntities.get(3).teleport(playerPos.add(distance, 0,  0));
     }
 }

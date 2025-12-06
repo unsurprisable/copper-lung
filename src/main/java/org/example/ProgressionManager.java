@@ -1,7 +1,5 @@
 package org.example;
 
-import net.kyori.adventure.text.Component;
-
 public class ProgressionManager {
 
     public static ProgressionManager Instance;
@@ -15,6 +13,8 @@ public class ProgressionManager {
 
     // ----- PROGRESSION FLAGS -----
     private boolean hasEnteredLargeCavern;
+    private boolean hasLeftObjective6;
+    private boolean hasLeftObjective8;
     // --- END PROGRESSION FLAGS ---
 
     public void objectiveCollected() {
@@ -45,10 +45,16 @@ public class ProgressionManager {
         }
     }
 
-    public void onSubmarinePositionChange(double mapX, double mapY, double yaw) {
-        if (mapX > 375 && !hasEnteredLargeCavern) {
-            SoundManager.play(SoundManager.METAL_BANG);
-            hasEnteredLargeCavern = true;
+    public void onSubmarinePositionChange(Submarine submarine, double mapX, double mapY, double yaw) {
+
+        if (!hasLeftObjective6 && MapManager.Instance.OBJECTIVE_6.getIsCompleted() && mapX <= 790) {
+            hasLeftObjective6 = true;
+            submarine.teleport(513.74, 355.60, 252.52);
+        }
+
+        if (!hasLeftObjective8 && MapManager.Instance.OBJECTIVE_8.getIsCompleted() && mapY >= 680) {
+            hasLeftObjective8 = true;
+            submarine.teleport(201.27, 720.04, 334.60);
         }
     }
 }

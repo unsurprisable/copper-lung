@@ -9,7 +9,7 @@ import net.minestom.server.item.Material;
 
 import java.util.Arrays;
 
-public class MapMarkerItem {
+public class MapObjective {
     private final ItemStack itemStack;
     private final AbstractInventory inventory;
     private final int slot;
@@ -19,7 +19,7 @@ public class MapMarkerItem {
     private final int y;
     private final int yaw;
 
-    public MapMarkerItem(AbstractInventory inventory, int slot, int x, int y, int yaw) {
+    public MapObjective(AbstractInventory inventory, int slot, int x, int y, int yaw) {
         this.inventory = inventory;
         this.slot = slot;
 

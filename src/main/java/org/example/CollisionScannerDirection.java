@@ -45,7 +45,7 @@ public class CollisionScannerDirection {
         if (!isDetecting) return;
 
         if (beepTimeTicksLeft <= 0) {
-            SoundManager.play(SoundManager.PROXIMITY);
+            SoundManager.play(SoundManager.PROXIMITY, new Vec(0.5, 2.5, -3.5));
             targetBeepTimeTicks = calculateTargetBeepTime(this.distance);
             beepTimeTicksLeft = targetBeepTimeTicks;
             entityMeta.setBrightness(Cockpit.GLOWING_BRIGHTNESS, 0);

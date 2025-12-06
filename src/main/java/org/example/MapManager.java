@@ -20,18 +20,18 @@ public class MapManager {
 
     private final Inventory mapMarkerInventory;
 
-    private final Set<MapMarkerItem> uncompletedMarkers;
+    private final Set<MapObjective> uncompletedMarkers;
 
-    public MapMarkerItem OBJECTIVE_1;
-    public MapMarkerItem OBJECTIVE_2;
-    public MapMarkerItem OBJECTIVE_3;
-    public MapMarkerItem OBJECTIVE_4;
-    public MapMarkerItem OBJECTIVE_5;
-    public MapMarkerItem OBJECTIVE_6;
-    public MapMarkerItem OBJECTIVE_7;
-    public MapMarkerItem OBJECTIVE_8;
-    public MapMarkerItem OBJECTIVE_9;
-    public MapMarkerItem OBJECTIVE_10;
+    public MapObjective OBJECTIVE_1;
+    public MapObjective OBJECTIVE_2;
+    public MapObjective OBJECTIVE_3;
+    public MapObjective OBJECTIVE_4;
+    public MapObjective OBJECTIVE_5;
+    public MapObjective OBJECTIVE_6;
+    public MapObjective OBJECTIVE_7;
+    public MapObjective OBJECTIVE_8;
+    public MapObjective OBJECTIVE_9;
+    public MapObjective OBJECTIVE_10;
 
     public MapManager() {
         if (Instance == null) {
@@ -53,16 +53,16 @@ public class MapManager {
             }
         });
 
-        OBJECTIVE_1 = new MapMarkerItem(Main.player.getInventory(), 20, 286, 181, 33);
-        OBJECTIVE_2 = new MapMarkerItem(Main.player.getInventory(), 11, 323, 282, 262);
-        OBJECTIVE_3 = new MapMarkerItem(mapMarkerInventory, 37, 201, 434, 251);
-        OBJECTIVE_4 = new MapMarkerItem(Main.player.getInventory(), 13, 517, 261, 357);
-        OBJECTIVE_5 = new MapMarkerItem(Main.player.getInventory(), 23, 604, 161, 72);
-        OBJECTIVE_6 = new MapMarkerItem(Main.player.getInventory(), 17, 895, 241, 250);
-        OBJECTIVE_7 = new MapMarkerItem(mapMarkerInventory, 32, 597, 552, 57);
-        OBJECTIVE_8 = new MapMarkerItem(mapMarkerInventory, 18, 107, 621, 62);
-        OBJECTIVE_9 = new MapMarkerItem(mapMarkerInventory, 11, 307, 747, 158);
-        OBJECTIVE_10 = new MapMarkerItem(mapMarkerInventory, 6,  724, 835, 153);
+        OBJECTIVE_1 = new MapObjective(Main.player.getInventory(), 20, 286, 181, 33);
+        OBJECTIVE_2 = new MapObjective(Main.player.getInventory(), 11, 323, 282, 262);
+        OBJECTIVE_3 = new MapObjective(mapMarkerInventory, 37, 201, 434, 251);
+        OBJECTIVE_4 = new MapObjective(Main.player.getInventory(), 13, 517, 261, 357);
+        OBJECTIVE_5 = new MapObjective(Main.player.getInventory(), 23, 604, 161, 72);
+        OBJECTIVE_6 = new MapObjective(Main.player.getInventory(), 17, 895, 241, 250);
+        OBJECTIVE_7 = new MapObjective(mapMarkerInventory, 32, 597, 552, 57);
+        OBJECTIVE_8 = new MapObjective(mapMarkerInventory, 18, 107, 621, 62);
+        OBJECTIVE_9 = new MapObjective(mapMarkerInventory, 11, 307, 747, 158);
+        OBJECTIVE_10 = new MapObjective(mapMarkerInventory, 6,  724, 835, 153);
 
         uncompletedMarkers = new HashSet<>();
         uncompletedMarkers.add(OBJECTIVE_1);
@@ -91,7 +91,7 @@ public class MapManager {
 
 //        Main.player.sendMessage(Component.text(String.format("Checking x:%.2f, y:%.2f, yaw:%.2f", origin.x(), origin.y(), origin.z())));
 
-        for (MapMarkerItem uncompleted : uncompletedMarkers) {
+        for (MapObjective uncompleted : uncompletedMarkers) {
 //            Main.player.sendMessage(Component.text(String.format("%d %d %d", uncompleted.getMapX(), uncompleted.getMapY(), uncompleted.getYaw())));
             if (!(uncompleted.getMapX() - bufX < origin.x() && origin.x() < uncompleted.getMapX() + bufX)) continue;
             if (!(uncompleted.getMapY() - bufY < origin.y() && origin.y() < uncompleted.getMapY() + bufY)) continue;
@@ -110,5 +110,21 @@ public class MapManager {
 
             break;
         }
+    }
+
+    public MapObjective getMapObjective(int objectiveNumber) {
+        return switch(objectiveNumber) {
+            case 1 -> MapManager.Instance.OBJECTIVE_1;
+            case 2 -> MapManager.Instance.OBJECTIVE_2;
+            case 3 -> MapManager.Instance.OBJECTIVE_3;
+            case 4 -> MapManager.Instance.OBJECTIVE_4;
+            case 5 -> MapManager.Instance.OBJECTIVE_5;
+            case 6 -> MapManager.Instance.OBJECTIVE_6;
+            case 7 -> MapManager.Instance.OBJECTIVE_7;
+            case 8 -> MapManager.Instance.OBJECTIVE_8;
+            case 9 -> MapManager.Instance.OBJECTIVE_9;
+            case 10 -> MapManager.Instance.OBJECTIVE_10;
+            default -> null;
+        };
     }
 }
