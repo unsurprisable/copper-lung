@@ -16,7 +16,7 @@ public class MovingSound {
     private final double maxDistanceSqr;
 
     private final double MAX_EMITTER_DISTANCE = 16;
-    private final double MIN_EMITTER_DISTANCE = 1.5;
+    private final double MIN_EMITTER_DISTANCE = 1;
     private final Entity emitter;
     private double soundLengthLeft = 0;
     private Pos playerPos = new Pos(0, 0, 32);
