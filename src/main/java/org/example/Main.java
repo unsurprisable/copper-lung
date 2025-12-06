@@ -29,7 +29,7 @@ public class Main {
 
             event.setSpawningInstance(Cockpit.Instance.getInstance());
             configPlayer.setRespawnPoint(new Pos(.5, 1, .5, 180, 0));
-            configPlayer.setGameMode(GameMode.ADVENTURE);
+            configPlayer.setGameMode(GameMode.CREATIVE);
         });
 
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {

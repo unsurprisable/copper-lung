@@ -9,25 +9,20 @@ import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.instance.InstanceContainer;
 
 public class MovingSound {
-    private final InstanceContainer instance;
-    private final Sound sound;
-    private final double soundLength;
+    private final LoopingSound sound;
     private final Point worldOrigin;
     private final double maxDistanceSqr;
 
     private final double MAX_EMITTER_DISTANCE = 16;
     private final double MIN_EMITTER_DISTANCE = 1;
     private final Entity emitter;
-    private double soundLengthLeft = 0;
     private Pos playerPos = new Pos(0, 0, 32);
 
     private boolean isTooFar = false;
 
     public MovingSound(InstanceContainer instance, Sound sound, double soundLength, Point worldOrigin, double maxDistance) {
-        this.instance = instance;
-        this.sound = sound;
+        this.sound = new LoopingSound(sound, soundLength, false);
         this.worldOrigin = worldOrigin;
-        this.soundLength = soundLength;
         this.maxDistanceSqr = maxDistance * maxDistance;
 
         this.emitter = new Entity(EntityType.ARMOR_STAND);
@@ -37,24 +32,14 @@ public class MovingSound {
         meta.setHasNoGravity(true);
 //        meta.setHasGlowingEffect(true); // debug
         emitter.setInstance(instance, playerPos);
-    }
 
-    private void playSound() {
-        SoundManager.play(sound, emitter);
+        this.sound.setEmitter(emitter);
     }
 
     public void update(int deltaTimeMillis) {
         playerPos = Main.player.getPosition();
         updateEmitterPosition();
-
-        if (isTooFar) return;
-
-        double deltaTime = deltaTimeMillis / 1000.0;
-        soundLengthLeft -= deltaTime;
-        if (soundLengthLeft <= 0) {
-            playSound();
-            soundLengthLeft = soundLength;
-        }
+        sound.update(deltaTimeMillis);
     }
 
     private void updateEmitterPosition() {
@@ -62,10 +47,10 @@ public class MovingSound {
 
         if (!isTooFar && distanceSqr > maxDistanceSqr) {
             isTooFar = true;
-            SoundManager.stop(sound);
-            soundLengthLeft = 0;
+            sound.stop();
         } else if (distanceSqr <= maxDistanceSqr) {
             isTooFar = false;
+            sound.play();
         }
 
         if (isTooFar) return;

@@ -2,7 +2,6 @@ package org.example;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.event.instance.InstanceTickEvent;
@@ -16,6 +15,7 @@ public class SoundManager {
 
     private final SubmarineMoveSFX subMoveSFX;
     private final ArrayList<MovingSound> movingSounds = new ArrayList<>();
+    private final ArrayList<LoopingSound> loopingSounds = new ArrayList<>();
 
     public SoundManager() {
         if (Instance == null) {
@@ -29,17 +29,22 @@ public class SoundManager {
         movingSounds.add(new MovingSound(
             instance, ARTERIES, 22.0,
             new Vec(110.5, 0, 54.5),
-            12
+            16
         ));
         movingSounds.add(new MovingSound(
             instance, VOID, 35,
             new Vec(160.5, 0, 32.5),
-            35.5
+            34.5
         ));
 
-        MinecraftServer.getGlobalEventHandler().addListener(InstanceTickEvent.class, event -> {
+        loopingSounds.add(new LoopingSound(
+            AMBIENT_NOISE, 39.8, true
+        ));
+
+        Cockpit.Instance.getInstance().eventNode().addListener(InstanceTickEvent.class, event -> {
             subMoveSFX.update(event.getDuration());
             movingSounds.forEach(movingSound -> movingSound.update(event.getDuration()));
+            loopingSounds.forEach(loopingSound -> loopingSound.update(event.getDuration()));
         });
     }
 
@@ -67,7 +72,7 @@ public class SoundManager {
     public static Sound SUCCESSFUL_PHOTOGRAPH = Sound.sound(
         Key.key("custom:successful_photograph"),
         Sound.Source.MASTER,
-        0.16f, 0.8f
+        0.13f, 0.8f
     );
     public static Sound TELEPORT = Sound.sound(
         Key.key("custom:teleport"),
@@ -93,6 +98,11 @@ public class SoundManager {
         Key.key("custom:void"),
         Sound.Source.MASTER,
         1.0f, 1.0f
+    );
+    public static Sound AMBIENT_NOISE = Sound.sound(
+        Key.key("custom:ambient_noise"),
+        Sound.Source.MASTER,
+        2.0f, 1.0f
     );
 
     public static void play(Sound sound) {
