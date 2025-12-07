@@ -11,7 +11,7 @@ public class CollisionScanner {
 
     private final CollisionScannerDirection[] scannerDirections;
 
-    public static final double MAX_DETECTION_DISTANCE = 2;
+    public static final double MAX_DETECTION_DISTANCE = 2.5;
 
     public CollisionScanner() {
         if (Instance == null) {

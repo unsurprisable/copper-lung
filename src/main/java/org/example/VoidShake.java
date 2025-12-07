@@ -7,8 +7,8 @@ import net.minestom.server.timer.TaskSchedule;
 public class VoidShake {
 
     private final float startingFOV = 0.1f;
-    private final float maxRange = 0.0075f;
-    private final double maxDistance = 20;
+    private final float maxRange = 0.008f;
+    private final double maxDistance = 16;
     private final Vec worldPos = new Vec(160.5, 0, 32.5);
     private final int tickFrequency = 10;
 

@@ -327,6 +327,7 @@ public class Cockpit {
 
         Vec origin = new Vec(Submarine.Instance.getMapX(), Submarine.Instance.getMapY(), Submarine.Instance.getYaw());
 
+        ProgressionManager.Instance.onPrePhotoTaken(origin.x(), origin.y(), origin.z());
         MapManager.Instance.checkIsPhotoValid(origin);
 
         Submarine.Instance.takePhoto();
@@ -337,6 +338,7 @@ public class Cockpit {
 
     private void onCameraFinish(Vec origin) {
         cameraButtonDisabled = false;
+        ProgressionManager.Instance.onPostPhotoTaken(origin.x(), origin.y(), origin.z());
     }
 
     private void spawnCameraMapScreen(Pos pos) {

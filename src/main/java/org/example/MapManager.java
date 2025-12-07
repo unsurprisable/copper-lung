@@ -61,7 +61,7 @@ public class MapManager {
         OBJECTIVE_5 = new MapObjective(Main.player.getInventory(), 23, 604, 161, 72);
         OBJECTIVE_6 = new MapObjective(Main.player.getInventory(), 17, 895, 241, 250);
         OBJECTIVE_7 = new MapObjective(mapMarkerInventory, 32, 597, 552, 57);
-        OBJECTIVE_8 = new MapObjective(mapMarkerInventory, 18, 107, 621, 62);
+        OBJECTIVE_8 = new MapObjective(mapMarkerInventory, 18, 103, 629, 336);
         OBJECTIVE_9 = new MapObjective(mapMarkerInventory, 11, 307, 747, 158);
         OBJECTIVE_10 = new MapObjective(mapMarkerInventory, 6,  724, 835, 153);
 

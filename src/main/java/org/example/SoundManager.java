@@ -35,7 +35,12 @@ public class SoundManager {
         movingSounds.add(new MovingSound(
             instance, VOID, 35,
             new Vec(160.5, 0, 32.5),
-            35
+            28
+        ));
+        movingSounds.add(new MovingSound(
+            instance, ARTERIES, 35,
+            new Vec(213.5, 0, 184.5),
+            12
         ));
 
         loopingSounds.add(new LoopingSound(
@@ -152,6 +157,31 @@ public class SoundManager {
         Key.key("custom:oxygen_notification"),
         Sound.Source.MASTER,
         1.0f, 1.0f
+    );
+    public static Sound STEAM_PIPE_BURST = Sound.sound(
+        Key.key("custom:steam_pipe_burst"),
+        Sound.Source.MASTER,
+        1.0f, 1.0f
+    );
+    public static Sound STEAM_PIPE_LOOP = Sound.sound(
+        Key.key("custom:steam_pipe_loop"),
+        Sound.Source.MASTER,
+        0.12f, 1.0f
+    );
+    public static Sound SCALY_ATTACK = Sound.sound(
+        Key.key("custom:scaly_attack"),
+        Sound.Source.MASTER,
+        20.0f, 1.0f
+    );
+    public static Sound SCALY_POST_ATTACK = Sound.sound(
+        Key.key("custom:scaly_post_attack"),
+        Sound.Source.MASTER,
+        0.9f, 1.0f
+    );
+    public static Sound FROG_JUMPSCARE = Sound.sound(
+        Key.key("custom:frog_jumpscare"),
+        Sound.Source.MASTER,
+        20.0f, 1.0f
     );
 
     public static void play(Sound sound) {

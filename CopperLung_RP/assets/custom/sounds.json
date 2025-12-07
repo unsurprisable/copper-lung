@@ -10,5 +10,65 @@
   },
   "submarine_move": {
     "sounds": [ "custom:submarine_move" ]
+  },
+  "successful_photograph": {
+    "sounds": [ "custom:successful_photo" ]
+  },
+  "teleport": {
+    "sounds": [ "custom:teleport" ]
+  },
+  "metal_bang": {
+    "sounds": [ "custom:metal_bang" ]
+  },
+  "proximity": {
+    "sounds": [ "custom:proximity" ]
+  },
+  "void": {
+    "sounds": [ "custom:void" ]
+  },
+  "arteries": {
+    "sounds": [ "custom:arteries" ]
+  },
+  "ambient_noise": {
+    "sounds": [ "custom:ambient_noise" ]
+  },
+  "threatening_ambience": {
+    "sounds": [ "custom:threatening_ambience" ]
+  },
+  "scaly_pass": {
+    "sounds": [ "custom:scaly_pass" ]
+  },
+  "scaly_growl_1": {
+    "sounds": [ "custom:scaly_growl_1" ]
+  },
+  "scaly_growl_2": {
+    "sounds": [ "custom:scaly_growl_2" ]
+  },
+  "scaly_growl_3": {
+    "sounds": [ "custom:scaly_growl_3" ]
+  },
+  "scaly_growl_4": {
+    "sounds": [ "custom:scaly_growl_4" ]
+  },
+  "scaly_growl": {
+    "sounds": [ "custom:scaly_growl_1", "custom:scaly_growl_2", "custom:scaly_growl_3", "custom:scaly_growl_4" ]
+  },
+  "oxygen_notification": {
+    "sounds": [ "custom:oxygen_notification" ]
+  },
+  "steam_pipe_burst": {
+    "sounds": [ "custom:steam_pipe_burst" ]
+  },
+  "steam_pipe_loop": {
+    "sounds": [ "custom:steam_pipe_loop" ]
+  },
+  "scaly_attack": {
+    "sounds": [ "custom:scaly_attack" ]
+  },
+  "scaly_post_attack": {
+    "sounds": [ "custom:scaly_post_attack" ]
+  },
+  "frog_jumpscare": {
+    "sounds": [ "custom:frog_jumpscare" ]
   }
 }

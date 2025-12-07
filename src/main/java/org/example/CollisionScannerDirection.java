@@ -48,9 +48,6 @@ public class CollisionScannerDirection {
             entityMeta.setBrightness(Cockpit.GLOWING_BRIGHTNESS, 0);
             if (!isForceDetecting) {
                 targetBeepTimeTicks = calculateTargetBeepTime(this.distance);
-            } else {
-                System.out.println("beepTimeTicksLeft: " + beepTimeTicksLeft);
-                System.out.println("targetBeepTimeTicks: " + targetBeepTimeTicks);
             }
             beepTimeTicksLeft = targetBeepTimeTicks;
         } else if (beepTimeTicksLeft <= targetBeepTimeTicks/2) {
