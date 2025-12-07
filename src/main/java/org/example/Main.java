@@ -8,6 +8,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.PlayerSkin;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.timer.TaskSchedule;
 
@@ -26,6 +27,10 @@ public class Main {
 
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
+            if (!MinecraftServer.getConnectionManager().getOnlinePlayers().isEmpty()) {
+                event.getPlayer().kick("§cGame in progress.\n§7This server is single-player only.");
+                return;
+            }
             Player configPlayer = event.getPlayer();
 
             event.setSpawningInstance(Cockpit.Instance.getInstance());
@@ -46,6 +51,11 @@ public class Main {
             new VoidShake();
 
             event.getPlayer().setSkin(PlayerSkin.fromUuid(event.getPlayer().getUuid().toString()));
+        });
+
+        globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
+            System.out.println("Player has disconnected. (sorry, I didn't implement disconnect support :/)\nShutting down server...");
+            MinecraftServer.stopCleanly();
         });
 
         server.start("localhost", 25565);
