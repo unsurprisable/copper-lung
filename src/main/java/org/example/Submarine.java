@@ -221,7 +221,7 @@ public class Submarine {
         this.yaw = newYaw;
         SoundManager.play(SoundManager.TELEPORT);
         Main.player.addEffect(new Potion(PotionEffect.BLINDNESS, 255, 25));
-        new Screenshake(5);
+        new Screenshake(5, 2f, 0.1f, 1f);
         camera.clearPrintingTask();
         camera.disableAndClearCameraMap();
     }

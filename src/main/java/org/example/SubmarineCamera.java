@@ -137,7 +137,7 @@ public class SubmarineCamera {
 
     public static final double MAX_WALL_DISTANCE = 4.5;
     public static final double MAX_SPRITE_DISTANCE = 4;
-    private final long PHOTO_GENERATE_TIME = 2500;
+    public final long PHOTO_GENERATE_TIME = 2500;
 
     public void takePhoto(Pos cameraPos) {
         disableAndClearCameraMap();
@@ -246,6 +246,20 @@ public class SubmarineCamera {
         */
         renderSprites(map_pixels, zBuffer, cameraPos);
 
+        /* ----- FOURTH RENDERING PASS -----
+                 Screen-Space  Sprites
+        */
+        if (ProgressionManager.Instance.shouldPrintCornerFish) {
+            ProgressionManager.Instance.shouldPrintCornerFish = false;
+            SpriteTexture texture = SpriteTexture.cornerFish();
+            drawScreenSprite(map_pixels, texture, 127-texture.width, 0);
+        }
+        if (ProgressionManager.Instance.shouldPrintScalyEye) {
+            ProgressionManager.Instance.shouldPrintScalyEye = false;
+            SpriteTexture texture = SpriteTexture.scalyEye();
+            drawScreenSprite(map_pixels, texture, 0, 0);
+        }
+
         /* ----- SENDING PACKET ----- */
 
         long timeUntilPhotoPrinted = PHOTO_GENERATE_TIME - (System.currentTimeMillis() - photoGenerateStartTime);
@@ -352,6 +366,25 @@ public class SubmarineCamera {
                         int screenIndex = stripe + (y * 128);
                         pixels[screenIndex] = finalPixel;
                     }
+                }
+            }
+        }
+    }
+
+    private void drawScreenSprite(byte[] pixels, SpriteTexture sprite, int x, int y) {
+        for (int spriteY = 0; spriteY < sprite.height; spriteY++) {
+            for (int spriteX = 0; spriteX < sprite.width; spriteX++) {
+
+                int screenX = x + spriteX;
+                int screenY = y + spriteY;
+
+                if (screenX < 0 || screenX >= 128 || screenY < 0 || screenY >= 128) continue;
+
+                int colorIndex = sprite.getPixel(spriteX, spriteY);
+
+                if (colorIndex != -1) {
+                    int screenIndex = screenX + (screenY * 128);
+                    pixels[screenIndex] = getFuzzyColor(colorIndex, 0.25);
                 }
             }
         }

@@ -9,6 +9,7 @@ import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.event.player.PlayerSwapItemEvent;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
+import net.minestom.server.timer.TaskSchedule;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -56,7 +57,7 @@ public class MapManager {
         OBJECTIVE_1 = new MapObjective(Main.player.getInventory(), 20, 286, 181, 33);
         OBJECTIVE_2 = new MapObjective(Main.player.getInventory(), 11, 323, 282, 262);
         OBJECTIVE_3 = new MapObjective(mapMarkerInventory, 37, 201, 434, 251);
-        OBJECTIVE_4 = new MapObjective(Main.player.getInventory(), 13, 517, 261, 357);
+        OBJECTIVE_4 = new MapObjective(Main.player.getInventory(), 13, 518, 263, 348);
         OBJECTIVE_5 = new MapObjective(Main.player.getInventory(), 23, 604, 161, 72);
         OBJECTIVE_6 = new MapObjective(Main.player.getInventory(), 17, 895, 241, 250);
         OBJECTIVE_7 = new MapObjective(mapMarkerInventory, 32, 597, 552, 57);
@@ -103,10 +104,15 @@ public class MapManager {
             // by now the photo is in this marker's zone
             uncompleted.setCompleted();
             uncompletedMarkers.remove(uncompleted);
-            SoundManager.play(SoundManager.SUCCESSFUL_PHOTOGRAPH);
-            Main.player.sendActionBar(Component.text("Photograph captured ✓")
-                .color(NamedTextColor.DARK_GRAY).decorate(TextDecoration.ITALIC));
-            ProgressionManager.Instance.objectiveCollected();
+
+            ProgressionManager.Instance.objectiveCollected(uncompleted);
+
+
+            MinecraftServer.getSchedulerManager().buildTask(() -> {
+                SoundManager.play(SoundManager.SUCCESSFUL_PHOTOGRAPH);
+                Main.player.sendActionBar(Component.text("Photograph captured ✓")
+                    .color(NamedTextColor.DARK_GRAY).decorate(TextDecoration.ITALIC));
+            }).delay(TaskSchedule.millis(Submarine.Instance.getCamera().PHOTO_GENERATE_TIME)).schedule();
 
             break;
         }

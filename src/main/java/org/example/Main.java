@@ -39,8 +39,10 @@ public class Main {
             Submarine.Instance.getCamera().disableAndClearCameraMap();
 
             new MapManager();
-            new SoundManager();
             new ProgressionManager();
+            new SoundManager();
+            new ScalySoundManager();
+            new VoidShake();
 
             event.getPlayer().setSkin(PlayerSkin.fromUuid(event.getPlayer().getUuid().toString()));
         });

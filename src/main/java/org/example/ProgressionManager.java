@@ -27,31 +27,26 @@ public class ProgressionManager {
     private boolean scriptedGrowlFour;
     // --- END PROGRESSION FLAGS ---
 
-    public void objectiveCollected() {
+    // ----- COMMUNICATION FLAGS -----
+    public boolean shouldPrintCornerFish;
+    public boolean shouldPrintScalyEye;
+    // --- END COMMUNICATION FLAGS ---
+
+
+    // NOTE: these trigger right when the photo button is pressed, not when it's finished printing
+    public void objectiveCollected(MapObjective objective) {
         objectiveAmount++;
 
-        switch (objectiveAmount) {
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                SoundManager.play(SoundManager.DARK_BRAMBLE);
-                break;
-            case 5:
-                break;
-            case 6:
-                break;
-            case 7:
-                break;
-            case 8:
-                break;
-            case 9:
-                break;
-            case 10:
-                break;
+        if (objective == MapManager.Instance.OBJECTIVE_3) {
+            ScalySoundManager.Instance.setAggressionLevel(0);
+            ScalySoundManager.Instance.setEnabled(true);
+        }
+
+        if (objective == MapManager.Instance.OBJECTIVE_4) {
+            SoundManager.play(SoundManager.DARK_BRAMBLE);
+            ScalySoundManager.Instance.setAggressionLevel(1);
+            ScalySoundManager.Instance.setEnabled(true);
+            shouldPrintCornerFish = true;
         }
     }
 
@@ -82,6 +77,7 @@ public class ProgressionManager {
         if (!hasEnteredLargeCavern && mapX >= 351) {
             hasEnteredLargeCavern = true;
             SoundManager.play(SoundManager.THREATENING_AMBIENCE);
+            ScalySoundManager.Instance.setEnabled(false);
         }
 
         if (!scalyHasPassedFirst && mapX >= 424) {

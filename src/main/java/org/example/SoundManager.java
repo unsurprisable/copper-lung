@@ -62,7 +62,7 @@ public class SoundManager {
     public static Sound DARK_BRAMBLE = Sound.sound(
         Key.key("custom:dark_bramble"),
         Sound.Source.MASTER,
-        1.0f, 1.0f
+        0.75f, 1.0f
     );
     public static Sound THREATENING_AMBIENCE = Sound.sound(
         Key.key("custom:threatening_ambience"),

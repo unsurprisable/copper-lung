@@ -325,8 +325,11 @@ public class Cockpit {
 
         Main.player.swingMainHand();
 
-        Submarine.Instance.takePhoto();
         Vec origin = new Vec(Submarine.Instance.getMapX(), Submarine.Instance.getMapY(), Submarine.Instance.getYaw());
+
+        MapManager.Instance.checkIsPhotoValid(origin);
+
+        Submarine.Instance.takePhoto();
 
         MinecraftServer.getSchedulerManager().scheduleTask(() -> onCameraFinish(origin),
             TaskSchedule.millis(cameraButtonDelay), TaskSchedule.stop());
@@ -334,7 +337,6 @@ public class Cockpit {
 
     private void onCameraFinish(Vec origin) {
         cameraButtonDisabled = false;
-        MapManager.Instance.checkIsPhotoValid(origin);
     }
 
     private void spawnCameraMapScreen(Pos pos) {

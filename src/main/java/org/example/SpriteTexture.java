@@ -48,4 +48,11 @@ public class SpriteTexture {
         }
         return tex;
     }
+
+    public static SpriteTexture cornerFish() {
+        return SpriteLoader.load("corner_fish");
+    }
+    public static SpriteTexture scalyEye() {
+        return SpriteLoader.load("scaly_eye");
+    }
 }
