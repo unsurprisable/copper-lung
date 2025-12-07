@@ -9,13 +9,13 @@ import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.instance.InstanceContainer;
 
 public class MovingSound {
-    private final LoopingSound sound;
+    protected final LoopingSound sound;
     private final Point worldOrigin;
-    private final double maxDistanceSqr;
+    private final double maxDistance;
 
     private final double MAX_EMITTER_DISTANCE = 16;
     private final double MIN_EMITTER_DISTANCE = 1;
-    private final Entity emitter;
+    protected final Entity emitter;
     private Pos playerPos = new Pos(0, 0, 32);
 
     private boolean isTooFar = false;
@@ -23,7 +23,7 @@ public class MovingSound {
     public MovingSound(InstanceContainer instance, Sound sound, double soundLength, Point worldOrigin, double maxDistance) {
         this.sound = new LoopingSound(sound, soundLength, false);
         this.worldOrigin = worldOrigin;
-        this.maxDistanceSqr = maxDistance * maxDistance;
+        this.maxDistance = maxDistance;
 
         this.emitter = new Entity(EntityType.ARMOR_STAND);
         ArmorStandMeta meta = (ArmorStandMeta) emitter.getEntityMeta();
@@ -43,19 +43,19 @@ public class MovingSound {
     }
 
     private void updateEmitterPosition() {
-        double distanceSqr = getWorldDistanceSqr();
+        double distance = getWorldDistance();
 
-        if (!isTooFar && distanceSqr > maxDistanceSqr) {
+        if (!isTooFar && distance > maxDistance) {
             isTooFar = true;
             sound.stop();
-        } else if (distanceSqr <= maxDistanceSqr) {
+        } else if (distance <= maxDistance) {
             isTooFar = false;
             sound.play();
         }
 
         if (isTooFar) return;
 
-        double distanceRatio = distanceSqr / maxDistanceSqr;
+        double distanceRatio = distance / maxDistance;
         double emitterDistance = MIN_EMITTER_DISTANCE + distanceRatio * (MAX_EMITTER_DISTANCE - MIN_EMITTER_DISTANCE);
         double emitterAngle = -getAngle();
 
@@ -67,8 +67,8 @@ public class MovingSound {
         emitter.teleport(finalEmitterPos);
     }
 
-    private double getWorldDistanceSqr() {
-        return Submarine.Instance.getWorldPosition().distanceSquared(worldOrigin);
+    private double getWorldDistance() {
+        return Submarine.Instance.getWorldPosition().distance(worldOrigin);
     }
 
     private double getAngle() {

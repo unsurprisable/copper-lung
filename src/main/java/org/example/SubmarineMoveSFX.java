@@ -21,7 +21,7 @@ public class SubmarineMoveSFX {
     private final double MAX_SPEED = Submarine.Instance.getMaxSpeed();
     private final double MIN_DISTANCE = 6;
     private final double MAX_DISTANCE = 16;
-    private final float VOLUME = 0.85f;
+    private final float VOLUME = 0.75f;
     private final int SOUND_DIRECTIONS = 4;
 
     private Pos playerPos = new Pos(0, 0, 32);

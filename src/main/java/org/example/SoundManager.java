@@ -16,6 +16,7 @@ public class SoundManager {
     private final SubmarineMoveSFX subMoveSFX;
     private final ArrayList<MovingSound> movingSounds = new ArrayList<>();
     private final ArrayList<LoopingSound> loopingSounds = new ArrayList<>();
+    private static final ArrayList<TemporaryMovingSound>  temporaryMovingSounds = new ArrayList<>();
 
     public SoundManager() {
         if (Instance == null) {
@@ -29,12 +30,12 @@ public class SoundManager {
         movingSounds.add(new MovingSound(
             instance, ARTERIES, 22.0,
             new Vec(110.5, 0, 54.5),
-            16
+            32
         ));
         movingSounds.add(new MovingSound(
             instance, VOID, 35,
             new Vec(160.5, 0, 32.5),
-            34.5
+            35
         ));
 
         loopingSounds.add(new LoopingSound(
@@ -45,6 +46,14 @@ public class SoundManager {
             subMoveSFX.update(event.getDuration());
             movingSounds.forEach(movingSound -> movingSound.update(event.getDuration()));
             loopingSounds.forEach(loopingSound -> loopingSound.update(event.getDuration()));
+            for (int i = temporaryMovingSounds.size()-1; i >= 0; i--) {
+                TemporaryMovingSound temporaryMovingSound = temporaryMovingSounds.get(i);
+                temporaryMovingSound.update(event.getDuration());
+                if (temporaryMovingSound.getIsMarkedForDeletion()) {
+                    temporaryMovingSound.delete();
+                    temporaryMovingSounds.remove(temporaryMovingSound);
+                }
+            }
         });
     }
 
@@ -54,6 +63,11 @@ public class SoundManager {
         Key.key("custom:dark_bramble"),
         Sound.Source.MASTER,
         1.0f, 1.0f
+    );
+    public static Sound THREATENING_AMBIENCE = Sound.sound(
+        Key.key("custom:threatening_ambience"),
+        Sound.Source.MASTER,
+        0.375f, 1.0f
     );
 
 
@@ -104,6 +118,41 @@ public class SoundManager {
         Sound.Source.MASTER,
         2.0f, 1.0f
     );
+    public static Sound SCALY_PASS = Sound.sound(
+        Key.key("custom:scaly_pass"),
+        Sound.Source.MASTER,
+        10.0f, 1.0f
+    );
+    public static Sound SCALY_GROWL_1 = Sound.sound(
+        Key.key("custom:scaly_growl_1"),
+        Sound.Source.MASTER,
+        10.0f, 1.0f
+    );
+    public static Sound SCALY_GROWL_2 = Sound.sound(
+        Key.key("custom:scaly_growl_2"),
+        Sound.Source.MASTER,
+        10.0f, 1.0f
+    );
+    public static Sound SCALY_GROWL_3 = Sound.sound(
+        Key.key("custom:scaly_growl_3"),
+        Sound.Source.MASTER,
+        10.0f, 1.0f
+    );
+    public static Sound SCALY_GROWL_4 = Sound.sound(
+        Key.key("custom:scaly_growl_4"),
+        Sound.Source.MASTER,
+        10.0f, 1.0f
+    );
+    public static Sound SCALY_GROWL = Sound.sound(
+        Key.key("custom:scaly_growl"),
+        Sound.Source.MASTER,
+        10.0f, 1.0f
+    );
+    public static Sound OXYGEN_NOTIFICATION = Sound.sound(
+        Key.key("custom:oxygen_notification"),
+        Sound.Source.MASTER,
+        1.0f, 1.0f
+    );
 
     public static void play(Sound sound) {
         if (Main.player == null) return;
@@ -121,5 +170,10 @@ public class SoundManager {
     public static void stop(Sound sound) {
         if (Main.player == null) return;
         Main.player.stopSound(sound);
+    }
+
+    public static void playTemporary(Sound sound, double soundLength, double angle, double distance) {
+        if (Main.player == null) return;
+        temporaryMovingSounds.add(new TemporaryMovingSound(Cockpit.Instance.getInstance(), sound, soundLength, angle, distance));
     }
 }

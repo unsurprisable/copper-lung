@@ -1,10 +1,12 @@
 package org.example;
 
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.coordinate.Point;
 
 public class LoopingSound {
     private final Sound sound;
     private Sound.Emitter emitter;
+    private Point origin;
     private final double duration;
     private double durationLeft = 0;
     private boolean isPlaying;
@@ -29,6 +31,8 @@ public class LoopingSound {
     private void playSound() {
         if (emitter != null) {
             SoundManager.play(sound, emitter);
+        } else if (origin != null) {
+            SoundManager.play(sound, origin);
         } else {
             SoundManager.play(sound);
         }
@@ -36,6 +40,11 @@ public class LoopingSound {
 
     public void setEmitter(Sound.Emitter emitter) {
         this.emitter = emitter;
+        this.origin = null;
+    }
+    public void setOrigin(Point origin) {
+        this.origin = origin;
+        this.emitter = null;
     }
 
     public void play() {

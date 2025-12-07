@@ -304,7 +304,7 @@ public class SubmarineCamera {
             double rotZ = relX * sin + relZ * cos; // distance from camera
 
             // clip if behind, too close, or too far
-            if (rotZ < 0.2 || rotZ > MAX_WALL_DISTANCE) continue;
+            if (rotZ < 0.4 || rotZ > MAX_WALL_DISTANCE) continue;
 
             double transformX = (-rotX / rotZ) * focalLength + halfWidth;
 

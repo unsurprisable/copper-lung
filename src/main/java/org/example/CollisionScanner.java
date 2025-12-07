@@ -38,6 +38,7 @@ public class CollisionScanner {
     public void searchForCollisions(Pos worldPos) {
         for (int i = 0; i < 4; i++) {
             CollisionScannerDirection scannerDirection =  scannerDirections[i];
+            if (scannerDirection.getIsForceDetecting()) continue;
             Pos origin = worldPos.withYaw(i * -90);
 
             double searchDistance = MAX_DETECTION_DISTANCE + Submarine.HITBOX_RADIUS;
@@ -49,5 +50,9 @@ public class CollisionScanner {
                 scannerDirection.objectDetected(distance - Submarine.HITBOX_RADIUS);
             }
         }
+    }
+
+    public CollisionScannerDirection getCollisionScannerDirection(int index) {
+        return scannerDirections[index];
     }
 }

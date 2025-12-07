@@ -24,6 +24,8 @@ public class CollisionScannerDirection {
     private boolean isDetecting = false;
     private double distance = 0;
 
+    private boolean isForceDetecting = false;
+
     public CollisionScannerDirection() {
         this.entity = new Entity(EntityType.TEXT_DISPLAY);
         this.entityMeta = (TextDisplayMeta) entity.getEntityMeta();
@@ -36,9 +38,6 @@ public class CollisionScannerDirection {
         entityMeta.setBackgroundColor(0);
 
         MinecraftServer.getSchedulerManager().buildTask(this::tickUpdate).repeat(TaskSchedule.nextTick()).schedule();
-
-        //test
-//        objectDetected(CollisionScanner.MAX_DETECTION_DISTANCE/2);
     }
 
     private void tickUpdate() {
@@ -46,9 +45,14 @@ public class CollisionScannerDirection {
 
         if (beepTimeTicksLeft <= 0) {
             SoundManager.play(SoundManager.PROXIMITY, new Vec(0.5, 2.5, -3.5));
-            targetBeepTimeTicks = calculateTargetBeepTime(this.distance);
-            beepTimeTicksLeft = targetBeepTimeTicks;
             entityMeta.setBrightness(Cockpit.GLOWING_BRIGHTNESS, 0);
+            if (!isForceDetecting) {
+                targetBeepTimeTicks = calculateTargetBeepTime(this.distance);
+            } else {
+                System.out.println("beepTimeTicksLeft: " + beepTimeTicksLeft);
+                System.out.println("targetBeepTimeTicks: " + targetBeepTimeTicks);
+            }
+            beepTimeTicksLeft = targetBeepTimeTicks;
         } else if (beepTimeTicksLeft <= targetBeepTimeTicks/2) {
             entityMeta.setBrightness(0, 0);
         }
@@ -69,12 +73,25 @@ public class CollisionScannerDirection {
 
     private int calculateTargetBeepTime(double distance) {
         double distRatio = (distance) / CollisionScanner.MAX_DETECTION_DISTANCE;
-        int targetTimeTicks = (int)(minBeepTimeTicks + distRatio * (maxBeepTimeTicks - minBeepTimeTicks));
-        if (targetTimeTicks % 2 == 1) targetTimeTicks--; // an odd tick number would cause the light/unlight timing to be uneven
-        return targetTimeTicks;
+        return (int)(minBeepTimeTicks + distRatio * (maxBeepTimeTicks - minBeepTimeTicks));
     };
 
     public void setInstance(InstanceContainer instance, Point origin) {
         entity.setInstance(instance, origin);
+    }
+
+    public void setForceDetecting() {
+        noObjectDetected();
+        targetBeepTimeTicks = 2;
+        beepTimeTicksLeft = 0;
+        isForceDetecting = true;
+        isDetecting = true;
+    }
+    public void stopForceDetecting() {
+        isForceDetecting = false;
+    }
+
+    public boolean getIsForceDetecting() {
+        return isForceDetecting;
     }
 }

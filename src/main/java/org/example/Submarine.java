@@ -32,7 +32,7 @@ public class Submarine {
     private int rotateDirection = 0;
 
     private final double minMoveAccel = 0.5;
-    private final double maxMoveAccel = 3.6;
+    private final double maxMoveAccel = 2.9;
     private final double moveDrag = 3.2;
     private final int moveAccelChargeTicks = 50;
     private final double minAngAccel = 0;
