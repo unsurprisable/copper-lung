@@ -10,6 +10,13 @@
       ]
     },
     {
+      "type": "bitmap",
+      "file": "icons:black.png",
+      "ascent": 2500,
+      "height": 5000,
+      "chars": ["\uE003"]
+    },
+    {
       "type": "space",
       "advances": {
         "\uF801": -8,

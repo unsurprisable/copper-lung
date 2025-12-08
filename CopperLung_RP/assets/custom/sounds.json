@@ -35,6 +35,9 @@
   "threatening_ambience": {
     "sounds": [ "custom:threatening_ambience" ]
   },
+  "ominous_ambience": {
+    "sounds": [ "custom:ominous_ambience" ]
+  },
   "scaly_pass": {
     "sounds": [ "custom:scaly_pass" ]
   },
@@ -70,5 +73,11 @@
   },
   "frog_jumpscare": {
     "sounds": [ "custom:frog_jumpscare" ]
+  },
+  "intro_theme": {
+    "sounds": [ "custom:intro_theme" ]
+  },
+  "intro_radio": {
+    "sounds": [ "custom:intro_radio" ]
   }
 }

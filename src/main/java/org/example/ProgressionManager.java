@@ -131,7 +131,10 @@ public class ProgressionManager {
 
         if (!secondOxygenNotification && mapX <= 412 && mapY > 500) {
             secondOxygenNotification = true;
-            SoundManager.play(SoundManager.OXYGEN_NOTIFICATION);
+            SoundManager.play(SoundManager.OXYGEN_NOTIFICATION, new Vec(1.01, 2.5, -3.01));
+            MinecraftServer.getSchedulerManager().buildTask(() -> SoundManager.play(SoundManager.OMINOUS_AMBIENCE))
+                .delay(TaskSchedule.tick(100)).schedule();
+
         }
 
         if (!hasEnteredSecondCavern && mapY > 650) {
@@ -160,7 +163,7 @@ public class ProgressionManager {
 
         if (!thirdOxygenNotification && mapX >= 496 && mapY > 650) {
             thirdOxygenNotification = true;
-            SoundManager.play(SoundManager.OXYGEN_NOTIFICATION);
+            SoundManager.play(SoundManager.OXYGEN_NOTIFICATION, new Vec(1.01, 2.5, -3.01));
         }
 
         if (!bloodStartedRising && mapX > 500 && mapY >= 740) {

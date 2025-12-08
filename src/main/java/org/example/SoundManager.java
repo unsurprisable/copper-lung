@@ -74,6 +74,11 @@ public class SoundManager {
         Sound.Source.MASTER,
         0.375f, 1.0f
     );
+    public static Sound OMINOUS_AMBIENCE = Sound.sound(
+        Key.key("custom:ominous_ambience"),
+        Sound.Source.MASTER,
+        0.375f, 1.0f
+    );
 
 
     // --- SOUND EFFECTS ---
@@ -156,12 +161,12 @@ public class SoundManager {
     public static Sound OXYGEN_NOTIFICATION = Sound.sound(
         Key.key("custom:oxygen_notification"),
         Sound.Source.MASTER,
-        1.0f, 1.0f
+        5.0f, 1.0f
     );
     public static Sound STEAM_PIPE_BURST = Sound.sound(
         Key.key("custom:steam_pipe_burst"),
         Sound.Source.MASTER,
-        1.0f, 1.0f
+        2.0f, 1.0f
     );
     public static Sound STEAM_PIPE_LOOP = Sound.sound(
         Key.key("custom:steam_pipe_loop"),
@@ -182,6 +187,16 @@ public class SoundManager {
         Key.key("custom:frog_jumpscare"),
         Sound.Source.MASTER,
         20.0f, 1.0f
+    );
+    public static Sound INTRO_THEME = Sound.sound(
+        Key.key("custom:intro_theme"),
+        Sound.Source.MASTER,
+        0.35f, 1.0f
+    );
+    public static Sound INTRO_RADIO = Sound.sound(
+        Key.key("custom:intro_radio"),
+        Sound.Source.MASTER,
+        0.35f, 1.0f
     );
 
     public static void play(Sound sound) {

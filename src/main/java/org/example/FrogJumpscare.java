@@ -29,7 +29,7 @@ public class FrogJumpscare {
         meta.setPosRotInterpolationDuration(TIME_TO_MOVE);
 
         display.setInstance(Cockpit.Instance.getInstance(), spawnPos);
-        SoundManager.play(SoundManager.FROG_JUMPSCARE, spawnPos);
+        SoundManager.play(SoundManager.FROG_JUMPSCARE);
         new Screenshake(5, 0.1f, 0.09f, 0.11f);
         Main.player.addEffect(new Potion(PotionEffect.BLINDNESS, 255, 30));
         Main.player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.075f);
