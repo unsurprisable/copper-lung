@@ -79,5 +79,11 @@
   },
   "intro_radio": {
     "sounds": [ "custom:intro_radio" ]
+  },
+  "hopeless_ambience": {
+    "sounds": [ "custom:hopeless_ambience" ]
+  },
+  "screaming_guy": {
+    "sounds": [ "custom:screaming_guy" ]
   }
 }
