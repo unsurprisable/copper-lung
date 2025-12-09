@@ -23,16 +23,15 @@ public class FrogJumpscare {
         ItemDisplayMeta meta = (ItemDisplayMeta) display.getEntityMeta();
 
         meta.setItemStack(ItemStack.of(Material.GLASS_PANE));
-        meta.setScale(new Vec(3.25, 3.25, 1));
+        meta.setScale(new Vec(3, 3, 1));
         meta.setHasNoGravity(true);
         meta.setBrightness(11, 0);
         meta.setPosRotInterpolationDuration(TIME_TO_MOVE);
 
         display.setInstance(Cockpit.Instance.getInstance(), spawnPos);
         SoundManager.play(SoundManager.FROG_JUMPSCARE);
-        new Screenshake(5, 0.1f, 0.09f, 0.11f);
+        new Screenshake(5, 0.2f, 0.19f, 0.21f);
         Main.player.addEffect(new Potion(PotionEffect.BLINDNESS, 255, 30));
-        Main.player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.075f);
         CollisionScanner.Instance.getCollisionScannerDirection(0).setForceDetecting();
         CollisionScanner.Instance.getCollisionScannerDirection(1).setForceDetecting();
         CollisionScanner.Instance.getCollisionScannerDirection(2).setForceDetecting();

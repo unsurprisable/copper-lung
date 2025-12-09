@@ -21,7 +21,8 @@ public class Main {
         new Submarine(new Vec(152.30, 120.82, 90));
         new Cockpit();
 
-//        MinecraftServer.getCommandManager().register(new TeleportCommand());
+        MinecraftServer.getCommandManager().register(new TeleportCommand());
+        MinecraftServer.getCommandManager().register(new SkipIntroCommand());
 
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
@@ -48,7 +49,7 @@ public class Main {
 
 
         globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
-            System.out.println("Player has disconnected. (sorry, I didn't implement disconnect support :/)\nShutting down server...");
+            System.out.println("Player has disconnected. (sorry, I didn't implement game saving :/)\nShutting down server...");
             MinecraftServer.stopCleanly();
         });
 

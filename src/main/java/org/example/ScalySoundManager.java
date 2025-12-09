@@ -24,9 +24,9 @@ public class ScalySoundManager {
             Instance = this;
         }
 
-        aggressionLevelData[0] = new AggressionLevelData(60.0, 225.0);
-        aggressionLevelData[1] = new AggressionLevelData(45.0, 150.0);
-        aggressionLevelData[2] = new AggressionLevelData(25.0, 90.0);
+        aggressionLevelData[0] = new AggressionLevelData(90.0, 300.0);
+        aggressionLevelData[1] = new AggressionLevelData(60.0, 220.0);
+        aggressionLevelData[2] = new AggressionLevelData(15.0, 145.0);
 
         Random rand = new Random();
         Cockpit.Instance.getInstance().eventNode().addListener(InstanceTickEvent.class, event -> {

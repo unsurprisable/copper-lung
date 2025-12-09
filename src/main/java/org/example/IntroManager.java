@@ -3,6 +3,7 @@ package org.example;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import net.minestom.server.MinecraftServer;
@@ -27,7 +28,7 @@ public class IntroManager {
 
     public static IntroManager Instance;
 
-    private final Runnable onComplete;
+    public final Runnable onComplete;
 
     private final Component INTRO_TEXT = Component.text(
         """
@@ -50,9 +51,10 @@ public class IntroManager {
         
         Type "I understand." to acknowledge and continue.
         """
-    ).color(NamedTextColor.GREEN);
+    ).color(TextColor.color(63, 145, 33));
 
     private final String[] POST_INTRO_TEXT = {
+        "\nReceiving objective briefing signal...:",
         "\nTwo weeks ago, we conducted an exploration of moon AT-5 for the first time since The Quiet Rapture, leading to the discovery of a fourth Blood Ocean. A trench beneath the ocean's surface has several points of interest.",
         "\nYour task is to photograph these points of interest with the SM13's forward camera. Photos must be taken within 2 units of the specified position and 10 degrees of the specified angle. You can also use the camera to help with navigation. Only photos taken at the specified points of interest will be saved.",
         "\nSince you can't navigate by sight, pay attention to your coordinates and consult the Map (\"F\" - swap items keybind). The proximity indicators next to the sub controls will trigger if you're getting close to an obstacle.",
@@ -77,6 +79,10 @@ public class IntroManager {
 
     private final int RADIO_MESSAGE_TIME = 37;
 
+    private final Sound chatSound = Sound.sound(SoundEvent.BLOCK_STONE_BREAK, Sound.Source.MASTER, 0.5f, 1f);
+    private final Entity mainTextDisplay;
+    private boolean chatMessageSent;
+
     public IntroManager(Runnable onComplete) {
         if (Instance == null) {
             Instance = this;
@@ -84,16 +90,16 @@ public class IntroManager {
 
         this.onComplete = onComplete;
 
-        Entity textDisplay = new Entity(EntityType.TEXT_DISPLAY);
-        TextDisplayMeta meta = (TextDisplayMeta) textDisplay.getEntityMeta();
+        mainTextDisplay = new Entity(EntityType.TEXT_DISPLAY);
+        TextDisplayMeta meta = (TextDisplayMeta) mainTextDisplay.getEntityMeta();
         meta.setText(INTRO_TEXT);
         meta.setAlignment(TextDisplayMeta.Alignment.CENTER);
         meta.setHasNoGravity(true);
         meta.setBillboardRenderConstraints(AbstractDisplayMeta.BillboardConstraints.FIXED);
-        meta.setBrightness(7, 0);
+        meta.setBrightness(15, 0);
         meta.setScale(new Vec(0.5));
         meta.setLineWidth(400);
-        textDisplay.setInstance(Cockpit.Instance.getInstance(), new Vec(0.5, 7.5, 0.01));
+        mainTextDisplay.setInstance(Cockpit.Instance.getInstance(), new Vec(0.5, 7.5, 0.01));
 
         chatListener = EventListener.of(PlayerChatEvent.class, this::checkChatEvent);
         moveListener = EventListener.of(PlayerMoveEvent.class, this::checkMoveEvent);
@@ -106,15 +112,20 @@ public class IntroManager {
 
     private void checkChatEvent(PlayerChatEvent event) {
         event.setCancelled(true);
-        event.getPlayer().playSound(Sound.sound(SoundEvent.BLOCK_STONE_BREAK, Sound.Source.MASTER, 0.5f, 1f));
-        String playerName = event.getPlayer().getUsername();
+        if (!chatMessageSent) {
+            ((TextDisplayMeta)mainTextDisplay.getEntityMeta()).setText(Component.text("Please type \"I understand.\" to acknowledge and continue.\n\n\n\n\n\n\n\n").color(TextColor.color(63, 145, 33)));
+        }
+        chatMessageSent = true;
+        event.getPlayer().playSound(chatSound);
         if (messageIndex == FAKE_MESSAGES.length - 1) {
             for (int i = 0; i < 100; i++) {
                 Main.player.sendMessage(Component.empty()); // clear the chat for last line
             }
+            event.getPlayer().sendMessage(Component.text("<" + event.getPlayer().getUsername() + "> " + FAKE_MESSAGES[messageIndex++]));
             startDiveSegment();
+        } else {
+            event.getPlayer().sendMessage(Component.text("<∁?∏√?⊂τ> " + FAKE_MESSAGES[messageIndex++]));
         }
-        event.getPlayer().sendMessage(Component.text("<" + playerName + "> " + FAKE_MESSAGES[messageIndex++]));
     }
 
     private void checkMoveEvent(PlayerMoveEvent event) {
@@ -152,12 +163,22 @@ public class IntroManager {
         Main.player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.085f);
         Main.player.setFieldViewModifier(0.1f);
         MinecraftServer.getGlobalEventHandler().removeListener(moveListener);
-        Main.player.sendMessage(Component.text(POST_INTRO_TEXT[0]).color(NamedTextColor.GREEN));
-        MinecraftServer.getSchedulerManager().buildTask(()->Main.player.sendMessage(Component.text(POST_INTRO_TEXT[1]).color(NamedTextColor.GREEN)))
-            .delay(Duration.ofSeconds(POST_INTRO_TEXT_LINE_DELAY)).schedule();
-        MinecraftServer.getSchedulerManager().buildTask(()->Main.player.sendMessage(Component.text(POST_INTRO_TEXT[2]).color(NamedTextColor.GREEN)))
-            .delay(Duration.ofSeconds(POST_INTRO_TEXT_LINE_DELAY * 2)).schedule();
-        MinecraftServer.getSchedulerManager().buildTask(()->Main.player.sendMessage(Component.text(POST_INTRO_TEXT[3]).color(NamedTextColor.GREEN)))
-            .delay(Duration.ofSeconds(POST_INTRO_TEXT_LINE_DELAY * 3)).schedule();
+        MinecraftServer.getSchedulerManager().buildTask(() -> {
+            for (int i = 0; i < 100; i++) {
+                Main.player.sendMessage(Component.empty()); // clear the chat
+            }
+            Main.player.sendMessage(Component.text(POST_INTRO_TEXT[0]).color(NamedTextColor.GREEN));
+            SoundManager.play(chatSound);
+            MinecraftServer.getSchedulerManager().buildTask(()->{Main.player.sendMessage(Component.text(POST_INTRO_TEXT[1]).color(NamedTextColor.GREEN));SoundManager.play(chatSound);})
+                .delay(Duration.ofSeconds(3)).schedule();
+            MinecraftServer.getSchedulerManager().buildTask(()->{Main.player.sendMessage(Component.text(POST_INTRO_TEXT[2]).color(NamedTextColor.GREEN));SoundManager.play(chatSound);})
+                .delay(Duration.ofSeconds(3 + POST_INTRO_TEXT_LINE_DELAY)).schedule();
+            MinecraftServer.getSchedulerManager().buildTask(()->{Main.player.sendMessage(Component.text(POST_INTRO_TEXT[3]).color(NamedTextColor.GREEN));SoundManager.play(chatSound);})
+                .delay(Duration.ofSeconds(3 + POST_INTRO_TEXT_LINE_DELAY * 2)).schedule();
+            MinecraftServer.getSchedulerManager().buildTask(()->{Main.player.sendMessage(Component.text(POST_INTRO_TEXT[4]).color(NamedTextColor.GREEN));SoundManager.play(chatSound);})
+                .delay(Duration.ofSeconds(3 + POST_INTRO_TEXT_LINE_DELAY * 3)).schedule();
+            MinecraftServer.getSchedulerManager().buildTask(()->SoundManager.play(SoundManager.HOPELESS_AMBIENCE))
+                .delay(Duration.ofSeconds(3 + POST_INTRO_TEXT_LINE_DELAY * 3 + 5)).schedule();
+        }).delay(Duration.ofSeconds(15)).schedule();
     }
 }

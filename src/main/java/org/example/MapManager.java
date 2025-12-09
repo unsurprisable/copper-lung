@@ -86,9 +86,9 @@ public class MapManager {
 
     public void checkIsPhotoValid(Vec origin) {
 
-        final int bufX = 1;   // within 2
-        final int bufY = 1;   // within 2
-        final int bufYaw = 5; // within 10
+        final int bufX = 2;   // within 2
+        final int bufY = 2;   // within 2
+        final int bufYaw = 10; // within 10
 
 //        Main.player.sendMessage(Component.text(String.format("Checking x:%.2f, y:%.2f, yaw:%.2f", origin.x(), origin.y(), origin.z())));
 

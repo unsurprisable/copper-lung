@@ -252,7 +252,7 @@ public class SubmarineCamera {
         if (ProgressionManager.Instance.shouldPrintCornerFish) {
             ProgressionManager.Instance.shouldPrintCornerFish = false;
             SpriteTexture texture = SpriteTexture.cornerFish();
-            drawScreenSprite(map_pixels, texture, 127-texture.width, 0);
+            drawScreenSprite(map_pixels, texture, 127-texture.width+3, 0); // magic number to tweak image position ik im lazy
         }
         if (ProgressionManager.Instance.shouldPrintScalyEye) {
             ProgressionManager.Instance.shouldPrintScalyEye = false;

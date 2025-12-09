@@ -13,7 +13,7 @@ public class RisingBlood {
     private final double startHeight = 1.01;
     private final double endHeight = 1.85;
     private final Entity display;
-    private final double timeToRise = 120;
+    private final double timeToRise = 90;
     private double risingTime = 0;
 
     public RisingBlood() {
@@ -23,7 +23,7 @@ public class RisingBlood {
         meta.setBlockState(Block.REDSTONE_BLOCK);
         meta.setScale(new Vec(width, 0.01, width));
         meta.setHasNoGravity(true);
-        meta.setBrightness(7, 0);
+        meta.setBrightness(1, 0);
 
         display.setInstance(Cockpit.Instance.getInstance(), new Vec(0.5 - width/2, startHeight, 0.5 - width/2));
 

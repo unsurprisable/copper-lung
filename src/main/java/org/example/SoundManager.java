@@ -67,7 +67,7 @@ public class SoundManager {
     public static Sound DARK_BRAMBLE = Sound.sound(
         Key.key("custom:dark_bramble"),
         Sound.Source.MASTER,
-        0.75f, 1.0f
+        0.375f, 1.0f
     );
     public static Sound THREATENING_AMBIENCE = Sound.sound(
         Key.key("custom:threatening_ambience"),
@@ -78,6 +78,11 @@ public class SoundManager {
         Key.key("custom:ominous_ambience"),
         Sound.Source.MASTER,
         0.375f, 1.0f
+    );
+    public static Sound HOPELESS_AMBIENCE = Sound.sound(
+        Key.key("custom:hopeless_ambience"),
+        Sound.Source.MASTER,
+        0.42f, 1.0f
     );
 
 
@@ -111,7 +116,7 @@ public class SoundManager {
     public static Sound PROXIMITY = Sound.sound(
         Key.key("custom:proximity"),
         Sound.Source.MASTER,
-        0.9f, 1.0f
+        0.65f, 1.0f
     );
     public static Sound ARTERIES = Sound.sound(
         Key.key("custom:arteries"),
@@ -163,6 +168,11 @@ public class SoundManager {
         Sound.Source.MASTER,
         5.0f, 1.0f
     );
+    public static Sound SCREAMING_GUY = Sound.sound(
+        Key.key("custom:screaming_guy"),
+        Sound.Source.MASTER,
+        0.85f, 1.0f
+    );
     public static Sound STEAM_PIPE_BURST = Sound.sound(
         Key.key("custom:steam_pipe_burst"),
         Sound.Source.MASTER,
@@ -181,7 +191,7 @@ public class SoundManager {
     public static Sound SCALY_POST_ATTACK = Sound.sound(
         Key.key("custom:scaly_post_attack"),
         Sound.Source.MASTER,
-        0.9f, 1.0f
+        20.0f, 1.0f
     );
     public static Sound FROG_JUMPSCARE = Sound.sound(
         Key.key("custom:frog_jumpscare"),

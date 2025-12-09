@@ -14,6 +14,7 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.metadata.display.AbstractDisplayMeta;
+import net.minestom.server.entity.metadata.display.BlockDisplayMeta;
 import net.minestom.server.entity.metadata.display.TextDisplayMeta;
 import net.minestom.server.entity.metadata.other.GlowItemFrameMeta;
 import net.minestom.server.entity.metadata.other.InteractionMeta;
@@ -22,6 +23,7 @@ import net.minestom.server.event.player.PlayerEntityInteractEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.anvil.AnvilLoader;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.SoundEffectPacket;
@@ -63,7 +65,7 @@ public class Cockpit {
     public static final TextColor GLOWING_COLOR = TextColor.color(185, 220, 93);
     public static final int GLOWING_BRIGHTNESS = 13;
 
-
+    public Entity lightEntity;
 
     public Cockpit() {
         if (Instance == null) {
@@ -105,11 +107,24 @@ public class Cockpit {
 
         spawnCameraMapScreen(cameraScreenPos);
 
+        spawnLightEntity();
+
         this.instance.eventNode().addListener(InstanceTickEvent.class, event -> {
             tickButtonReset();
             ticksSinceLastInput++;
             updatePositionDisplay();
         });
+    }
+
+    private void spawnLightEntity() {
+        double scale = 0.26;
+        lightEntity = new Entity(EntityType.BLOCK_DISPLAY);
+        BlockDisplayMeta meta = (BlockDisplayMeta) lightEntity.getEntityMeta();
+        meta.setBlockState(Block.OCHRE_FROGLIGHT);
+        meta.setScale(new Vec(scale));
+        meta.setBrightness(12, 0);
+        meta.setHasNoGravity(true);
+        lightEntity.setInstance(instance, new Vec(0.5-scale/2, 3.125-scale/2, -2.5-scale/2));
     }
 
     private void spawnControlButton(Pos pos, String icon, Vec scale, float width, float height, ButtonType buttonType, Runnable action) {
