@@ -95,7 +95,7 @@ public class SoundManager {
     public static Sound TAKE_PHOTO = Sound.sound(
         Key.key("custom:take_photo"),
         Sound.Source.MASTER,
-        1.0f,
+        0.85f,
         1.0f
     );
     public static Sound SUCCESSFUL_PHOTOGRAPH = Sound.sound(

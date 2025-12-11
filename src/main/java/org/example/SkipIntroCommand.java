@@ -10,6 +10,7 @@ public class SkipIntroCommand extends Command {
         setDefaultExecutor((sender, command) -> {
             Main.player.teleport(new Pos(0.5, 1, 0.5, 180, 0));
             IntroManager.Instance.onComplete.run();
+            Main.player.stopSound(SoundManager.INTRO_THEME);
         });
     }
 }
