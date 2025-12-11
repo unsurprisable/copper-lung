@@ -135,7 +135,7 @@ public class IntroManager {
 
     private void startDiveSegment() {
         Main.player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.0f);
-        Main.player.setFieldViewModifier(0.03f);
+        Main.player.setFieldViewModifier(0.01f);
         Main.player.addEffect(new Potion(PotionEffect.BLINDNESS, 255, RADIO_MESSAGE_TIME*20 + 20));
         Main.player.stopSound(SoundManager.INTRO_THEME);
         MinecraftServer.getGlobalEventHandler().removeListener(chatListener);
@@ -144,8 +144,8 @@ public class IntroManager {
             Component.text(" ").color(NamedTextColor.WHITE),
             Title.Times.times(
                 Duration.ZERO,
-                Duration.ofMillis(750),
-                Duration.ofMillis(22000)
+                Duration.ofMillis(2750),
+                Duration.ofMillis(20000)
             )
         ));
         Cockpit.Instance.getInstance().setBlock(0, 2, -1, Block.BARRIER);
@@ -178,7 +178,7 @@ public class IntroManager {
             MinecraftServer.getSchedulerManager().buildTask(()->{Main.player.sendMessage(Component.text(POST_INTRO_TEXT[4]).color(NamedTextColor.GREEN));SoundManager.play(chatSound);})
                 .delay(Duration.ofSeconds(3 + POST_INTRO_TEXT_LINE_DELAY * 3)).schedule();
             MinecraftServer.getSchedulerManager().buildTask(()->SoundManager.play(SoundManager.HOPELESS_AMBIENCE))
-                .delay(Duration.ofSeconds(3 + POST_INTRO_TEXT_LINE_DELAY * 3 + 5)).schedule();
+                .delay(Duration.ofSeconds(3 + POST_INTRO_TEXT_LINE_DELAY * 3 + 1)).schedule();
         }).delay(Duration.ofSeconds(15)).schedule();
     }
 }

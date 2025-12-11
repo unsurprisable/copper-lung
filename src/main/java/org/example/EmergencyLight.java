@@ -11,9 +11,9 @@ public class EmergencyLight {
     public EmergencyLight() {
         Random rand = new Random();
         MinecraftServer.getSchedulerManager().buildTask(() -> {
-            int level = 4;
+            int level = 3;
             if (rand.nextFloat() > 0.75) {
-                level = rand.nextInt(5, 7);
+                level = rand.nextInt(4, 6);
             }
 
             Block light = Block.LIGHT.withProperty("level", String.valueOf(level));

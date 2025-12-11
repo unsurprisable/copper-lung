@@ -173,6 +173,11 @@ public class SoundManager {
         Sound.Source.MASTER,
         0.85f, 1.0f
     );
+    public static Sound SCRAPE = Sound.sound(
+        Key.key("custom:scrape"),
+        Sound.Source.MASTER,
+        0.65f, 1.0f
+    );
     public static Sound STEAM_PIPE_BURST = Sound.sound(
         Key.key("custom:steam_pipe_burst"),
         Sound.Source.MASTER,

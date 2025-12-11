@@ -32,14 +32,15 @@ public class ProgressionManager {
     // ----- PROGRESSION FLAGS -----
     private boolean screamingGuy;
     private boolean largeCavernSteam;
-    private boolean hasTriggeredCavernMusic;
     private boolean objectiveSixSteam;
     private boolean objectiveSixTeleport;
     private boolean hasLeftObjective8;
     private boolean objectiveEightSteam;
     private boolean secondOxygenNotification;
-    private boolean thirdOxygenNotification;
     private boolean hasEnteredSecondCavern;
+    private boolean thirdOxygenNotification;
+    private boolean fourthSteam;
+    private boolean fifthSteam;
 
     private boolean scriptedGrowlOne;
     private boolean scriptedGrowlTwo;
@@ -95,9 +96,10 @@ public class ProgressionManager {
         if (!scriptedGrowlFour && MapManager.Instance.OBJECTIVE_2.getIsCompleted() && mapX <= 265 && mapY >= 335) {
             scriptedGrowlFour = true;
             SoundManager.playTemporary(SoundManager.SCALY_GROWL_1, 15, 25, 25);
-            MinecraftServer.getSchedulerManager().buildTask(
-                () -> SoundManager.play(SoundManager.OXYGEN_NOTIFICATION, new Vec(1.01, 2.5, -3.01)))
-                .delay(TaskSchedule.tick(100)).schedule();
+            MinecraftServer.getSchedulerManager().buildTask(() -> {
+                    SoundManager.play(SoundManager.OXYGEN_NOTIFICATION, new Vec(1.01, 2.5, -3.01));
+                    Main.player.sendActionBar(Component.text("Oxygen: 75%").color(NamedTextColor.GREEN));
+                }).delay(TaskSchedule.tick(100)).schedule();
         }
 
         if (!screamingGuy && MapManager.Instance.OBJECTIVE_3.getIsCompleted() && mapX >= 287) {
@@ -105,18 +107,14 @@ public class ProgressionManager {
             SoundManager.playTemporary(SoundManager.SCREAMING_GUY, 10, 135, 10);
         }
 
-        if (!largeCavernSteam && mapX >= 368) {
+        if (!largeCavernSteam && mapX >= 374 && mapY < 360) {
             largeCavernSteam = true;
+            SoundManager.play(SoundManager.THREATENING_AMBIENCE);
+            ScalySoundManager.Instance.setEnabled(false);
             new PipeSteam(
                 new Vec(1.4, 2.35, 0.4),
                 new Vec(-3, 0.5, -4).normalize()
             );
-        }
-
-        if (!hasTriggeredCavernMusic && mapX >= 412) {
-            hasTriggeredCavernMusic = true;
-            SoundManager.play(SoundManager.THREATENING_AMBIENCE);
-            ScalySoundManager.Instance.setEnabled(false);
         }
 
         if (!scalyHasPassedFirst && mapX >= 479) {
@@ -131,7 +129,7 @@ public class ProgressionManager {
         if (!objectiveSixSteam && MapManager.Instance.OBJECTIVE_6.getIsCompleted() && mapX <= 826) {
             objectiveSixSteam = true;
             new PipeSteam(
-                new Vec(-0.4, 2.2, -2.4),
+                new Vec(-0.4, 2.75, -2.4),
                 new Vec(0.75, -0.8, -0.25).normalize()
             );
         }
@@ -153,6 +151,7 @@ public class ProgressionManager {
         if (!secondOxygenNotification && mapX <= 412 && mapY > 500) {
             secondOxygenNotification = true;
             SoundManager.play(SoundManager.OXYGEN_NOTIFICATION, new Vec(1.01, 2.5, -3.01));
+            Main.player.sendActionBar(Component.text("Oxygen: 50%").color(NamedTextColor.GOLD));
             MinecraftServer.getSchedulerManager().buildTask(() -> SoundManager.play(SoundManager.OMINOUS_AMBIENCE))
                 .delay(TaskSchedule.tick(100)).schedule();
 
@@ -180,16 +179,34 @@ public class ProgressionManager {
             scalyTriesAttack = true;
             scalyAttacksNextPhoto = true;
             CollisionScanner.Instance.getCollisionScannerDirection(0).setForceDetecting();
+            ScalySoundManager.Instance.setEnabled(false);
         }
 
         if (!thirdOxygenNotification && mapX >= 477 && mapY > 650) {
             thirdOxygenNotification = true;
             SoundManager.play(SoundManager.OXYGEN_NOTIFICATION, new Vec(1.01, 2.5, -3.01));
+            Main.player.sendActionBar(Component.text("Oxygen: 10%").color(NamedTextColor.RED));
         }
 
         if (!bloodStartedRising && mapX > 500 && mapY >= 740) {
             bloodStartedRising = true;
             new RisingBlood();
+        }
+
+        if (!fourthSteam && mapX >= 567 && mapY > 740) {
+            fourthSteam = true;
+            new PipeSteam(
+                new Vec(1.5, 2.4, -2.4),
+                new Vec(-0.25, -0.2, 1).normalize()
+            );
+        }
+
+        if (!fifthSteam && mapX >= 582 && mapY > 740) {
+            fifthSteam = true;
+            new PipeSteam(
+                new Vec(-0.5, 2.4, -0.6),
+                new Vec(0.1, -0.7, -1).normalize()
+            );
         }
 
         if (!triggeredFrogJumpscareZone && mapX >= 720 && mapY >= 831) {
@@ -204,7 +221,7 @@ public class ProgressionManager {
                     return;
                 }
                 Pos newPos = event.getNewPosition();
-                if (!frogIsJumpscaring && Math.abs(newPos.yaw()) < 30) {
+                if (!frogIsJumpscaring && Math.abs(newPos.yaw()) < 35) {
                     frogIsJumpscaring = true;
                     new FrogJumpscare();
                     MinecraftServer.getSchedulerManager().buildTask(() -> {
@@ -235,6 +252,9 @@ public class ProgressionManager {
             scalyAttacksNextPhoto = false;
             CollisionScanner.Instance.getCollisionScannerDirection(0).stopForceDetecting();
             SoundManager.play(SoundManager.SCALY_ATTACK, new Vec(0.5, 1.5, -3.5));
+            SoundManager.stop(SoundManager.THREATENING_AMBIENCE);
+            SoundManager.stop(SoundManager.OMINOUS_AMBIENCE);
+            SoundManager.stop(SoundManager.HOPELESS_AMBIENCE);
             MinecraftServer.getSchedulerManager().buildTask(() -> {
                 new Screenshake(10, 30f, 0.1f, 3f);
                 Main.player.addEffect(new Potion(PotionEffect.BLINDNESS, 255, 30));
@@ -242,6 +262,8 @@ public class ProgressionManager {
                 Submarine.Instance.getCamera().disableAndClearCameraMap();
                 SoundManager.play(SoundManager.SCALY_POST_ATTACK);
                 new EmergencyLight();
+                ScalySoundManager.Instance.setEnabled(true);
+                ScalySoundManager.Instance.setAggressionLevel(3);
             }).delay(TaskSchedule.tick(40)).schedule();
         }
 

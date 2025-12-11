@@ -33,7 +33,7 @@ public class Main {
             Player configPlayer = event.getPlayer();
 
             event.setSpawningInstance(Cockpit.Instance.getInstance());
-            configPlayer.setRespawnPoint(new Pos(.5, 7, 2.25, 180, 0));
+            configPlayer.setRespawnPoint(new Pos(.5, 7, 2.5, 180, 0));
             configPlayer.setGameMode(GameMode.ADVENTURE);
         });
 
@@ -62,6 +62,7 @@ public class Main {
         new ProgressionManager();
         new SoundManager();
         new ScalySoundManager();
+        new RandomSoundManager();
         new VoidShake();
     }
 }

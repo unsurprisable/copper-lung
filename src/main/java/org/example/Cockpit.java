@@ -122,7 +122,7 @@ public class Cockpit {
         BlockDisplayMeta meta = (BlockDisplayMeta) lightEntity.getEntityMeta();
         meta.setBlockState(Block.OCHRE_FROGLIGHT);
         meta.setScale(new Vec(scale));
-        meta.setBrightness(12, 0);
+        meta.setBrightness(9, 0);
         meta.setHasNoGravity(true);
         lightEntity.setInstance(instance, new Vec(0.5-scale/2, 3.125-scale/2, -2.5-scale/2));
     }
@@ -274,6 +274,7 @@ public class Cockpit {
         compMeta.setScale(compassScale);
         compMeta.setHasNoGravity(true);
         compMeta.setTranslation(new Vec(-0.0105, -0.0556, 0));
+        compMeta.setBackgroundColor(0);
 
         compassNeedleEntity.setInstance(instance, controlCenter.add(compassOffset).withY(controlCenter.y()+BUTTON_HEIGHT));
 

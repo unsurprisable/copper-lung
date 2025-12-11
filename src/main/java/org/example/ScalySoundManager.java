@@ -13,7 +13,7 @@ public class ScalySoundManager {
         double maxGrowlTime
     ) {}
 
-    private final AggressionLevelData[] aggressionLevelData = new AggressionLevelData[3];
+    private final AggressionLevelData[] aggressionLevelData = new AggressionLevelData[4];
     private AggressionLevelData aggressionLevel;
     private boolean isEnabled = false;
 
@@ -24,9 +24,10 @@ public class ScalySoundManager {
             Instance = this;
         }
 
-        aggressionLevelData[0] = new AggressionLevelData(90.0, 300.0);
-        aggressionLevelData[1] = new AggressionLevelData(60.0, 220.0);
-        aggressionLevelData[2] = new AggressionLevelData(15.0, 145.0);
+        aggressionLevelData[0] = new AggressionLevelData(90.0, 220.0);
+        aggressionLevelData[1] = new AggressionLevelData(45.0, 120.0);
+        aggressionLevelData[2] = new AggressionLevelData(15.0, 75.0);
+        aggressionLevelData[3] = new AggressionLevelData(5.0, 30.0);
 
         Random rand = new Random();
         Cockpit.Instance.getInstance().eventNode().addListener(InstanceTickEvent.class, event -> {
