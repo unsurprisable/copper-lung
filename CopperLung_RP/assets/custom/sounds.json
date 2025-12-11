@@ -85,5 +85,8 @@
   },
   "screaming_guy": {
     "sounds": [ "custom:screaming_guy" ]
+  },
+  "scrape": {
+    "sounds": [ "custom:scrape_01", "custom:scrape_02", "custom:scrape_03", "custom:scrape_04", "custom:scrape_11", "custom:scrape_12", "custom:scrape_13", "custom:scrape_14" ]
   }
 }
