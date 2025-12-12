@@ -33,12 +33,12 @@ public class SoundManager {
             32
         ));
         movingSounds.add(new MovingSound(
-            instance, VOID, 35,
+            instance, VOID, 35.0,
             new Vec(160.5, 0, 32.5),
             28
         ));
         movingSounds.add(new MovingSound(
-            instance, ARTERIES, 35,
+            instance, ARTERIES, 22.0,
             new Vec(213.5, 0, 184.5),
             12
         ));

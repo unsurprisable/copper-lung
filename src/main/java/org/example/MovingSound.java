@@ -50,7 +50,6 @@ public class MovingSound {
             sound.stop();
         } else if (distance <= maxDistance) {
             isTooFar = false;
-            sound.play();
         }
 
         if (isTooFar) return;
@@ -65,6 +64,7 @@ public class MovingSound {
 
         Pos finalEmitterPos = playerPos.add(offsetX, 0, offsetZ);
         emitter.teleport(finalEmitterPos);
+        sound.play();
     }
 
     private double getWorldDistance() {
