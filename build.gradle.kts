@@ -7,11 +7,16 @@ group = "org.example"
 version = "1.0-SNAPSHOT"
 
 repositories {
+    maven(url = "https://central.sonatype.com/repository/maven-snapshots/") {
+        content {
+            includeModule("net.minestom", "minestom")
+        }
+    }
     mavenCentral()
 }
 
 dependencies {
-    implementation("net.minestom:minestom:2025.10.31-1.21.10")
+    implementation("net.minestom:minestom:1_21_11-SNAPSHOT")
 }
 
 java {
