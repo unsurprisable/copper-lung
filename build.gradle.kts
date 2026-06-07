@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.minestom:minestom:1_21_11-SNAPSHOT")
+    implementation("net.minestom:minestom:2025.12.20-1.21.11")
 }
 
 java {

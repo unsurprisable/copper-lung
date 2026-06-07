@@ -21,8 +21,8 @@ public class Main {
         new Submarine(new Vec(152.30, 120.82, 90));
         new Cockpit();
 
-//        MinecraftServer.getCommandManager().register(new TeleportCommand());
-//        MinecraftServer.getCommandManager().register(new SkipIntroCommand());
+        MinecraftServer.getCommandManager().register(new TeleportCommand());
+        MinecraftServer.getCommandManager().register(new SkipIntroCommand());
 
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
