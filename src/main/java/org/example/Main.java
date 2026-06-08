@@ -1,5 +1,6 @@
 package org.example;
 
+import net.kyori.adventure.resource.ResourcePackRequest;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -24,10 +25,12 @@ public class Main {
         MinecraftServer.getCommandManager().register(new TeleportCommand());
         MinecraftServer.getCommandManager().register(new SkipIntroCommand());
 
+        ResourcePackRequest localPack = LocalPackServer.startAndGetPack();
+
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             if (!MinecraftServer.getConnectionManager().getOnlinePlayers().isEmpty()) {
-                event.getPlayer().kick("§cGame in progress.\n§7This server is single-player only.");
+                event.getPlayer().kick("Game in progress.\nThis server is single-player only.");
                 return;
             }
             Player configPlayer = event.getPlayer();
@@ -39,6 +42,11 @@ public class Main {
 
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
             player = event.getPlayer();
+
+            if (localPack != null) {
+                event.getPlayer().sendResourcePacks(localPack);
+            }
+
             event.getPlayer().setSkin(PlayerSkin.fromUuid(event.getPlayer().getUuid().toString()));
 
             new IntroManager(Main::startGame);
@@ -55,6 +63,13 @@ public class Main {
 
         server.start("0.0.0.0", 25565);
         System.out.println("Starting server on port 25565...");
+        System.out.println("""
+            
+            ---------------------------------------------------------------------------
+            |  Join the game on Minecraft by typing "localhost" into Direct Connect.  |
+            |  Have fun! (ignore any warnings below this)                             |
+            ---------------------------------------------------------------------------
+            """);
     }
 
     public static void startGame() {

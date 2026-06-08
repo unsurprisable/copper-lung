@@ -21,6 +21,7 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 
@@ -30,7 +31,7 @@ public class IntroManager {
 
     public final Runnable onComplete;
 
-    private final Component INTRO_TEXT = Component.text(
+    private static final Component INTRO_TEXT = Component.text(
         """
         Decades ago, every known star and habitable planet vanished, leaving only
         those who were on space stations or starships. This event became known as
@@ -74,10 +75,10 @@ public class IntroManager {
         "I understand."
     };
     private int messageIndex = 0;
-    private final EventListener<PlayerChatEvent> chatListener;
-    private final EventListener<PlayerMoveEvent> moveListener;
+    private final EventListener<@NotNull PlayerChatEvent> chatListener;
+    private final EventListener<@NotNull PlayerMoveEvent> moveListener;
 
-    private final int RADIO_MESSAGE_TIME = 37;
+    private static final int RADIO_MESSAGE_TIME = 37;
 
     private final Sound chatSound = Sound.sound(SoundEvent.BLOCK_STONE_BREAK, Sound.Source.MASTER, 0.5f, 1f);
     private final Entity mainTextDisplay;
